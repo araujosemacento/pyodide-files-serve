@@ -373,6 +373,31 @@
     border-color: rgba(251, 146, 60, 0.4);
   }
 
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .header-content {
+    flex: 1;
+    text-align: center;
+  }
+
+  .header-controls {
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1001;
+  }
+
+  .header {
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--color-theme-1);
+    margin-bottom: 2rem;
+  }
+
   @media (max-width: 768px) {
     .controls {
       flex-direction: column;
@@ -388,6 +413,21 @@
 
     .stats {
       gap: 1rem;
+    }
+
+    .header-top {
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .header-content {
+      order: 1;
+    }
+
+    .header-controls {
+      order: 2;
+      align-self: flex-end;
     }
   }
 </style>
