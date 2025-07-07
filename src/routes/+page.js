@@ -1,9 +1,10 @@
 import yaml from 'js-yaml';
+import { base } from '$app/paths';
 
 export async function load({ fetch }) {
   try {
-    // Carrega configuração do arquivo YAML
-    const response = await fetch('/config.yml');
+    // Carrega configuração do arquivo YAML (agora sem problemas de CORS)
+    const response = await fetch(`${base}/config.yml`);
 
     if (!response.ok) {
       throw new Error('Config file not found');
@@ -25,7 +26,7 @@ export async function load({ fetch }) {
       config: {
         title: 'Pyodide v0.28.0 - Repositório Backup',
         description: 'Backup da distribuição Pyodide v0.28.0 disponível como salvaguarda',
-        baseUrl: ''
+        baseUrl: base
       },
       files: []
     };
