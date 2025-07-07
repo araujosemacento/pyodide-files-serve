@@ -108,7 +108,7 @@
         "Need maximum compatibility",
         "Team hasn't migrated to ESM yet"
       ],
-      "esmodule_when": "� Use ES Module if:",
+      "esmodule_when": "♦️ Use ES Module if:",
       "esmodule_scenarios": [
         "New or modern project",
         "Vite, Rollup, or Webpack 5",
@@ -127,7 +127,7 @@
       "almost_ready": "Almost ready..."
     }
   },
-  "search_placeholder": "�🔍 Search packages...",
+  "search_placeholder": "🔍 Search packages...",
   "category": "Category:",
   "all_categories": "All categories",
   "stats": {
