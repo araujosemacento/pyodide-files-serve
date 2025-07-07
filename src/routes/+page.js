@@ -1,12 +1,15 @@
-import { readFile } from 'fs/promises';
-import { join } from 'path';
 import yaml from 'js-yaml';
 
-export async function load() {
+export async function load({ fetch }) {
   try {
     // Carrega configuração do arquivo YAML
-    const configPath = join(process.cwd(), 'static', 'config.yml');
-    const configContent = await readFile(configPath, 'utf8');
+    const response = await fetch('/config.yml');
+    
+    if (!response.ok) {
+      throw new Error('Config file not found');
+    }
+    
+    const configContent = await response.text();
     const config = yaml.load(configContent);
 
     return {
