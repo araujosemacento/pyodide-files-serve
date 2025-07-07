@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="/pyodide-files-serve/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pyodide v0.28.0 Backup Repository</title>
+    
+		<link rel="modulepreload" href="/pyodide-files-serve/_app/immutable/entry/start.C9kxkr_z.js">
+		<link rel="modulepreload" href="/pyodide-files-serve/_app/immutable/chunks/CMxVrZT7.js">
+		<link rel="modulepreload" href="/pyodide-files-serve/_app/immutable/chunks/BDpE-Owe.js">
+		<link rel="modulepreload" href="/pyodide-files-serve/_app/immutable/chunks/C6mefRWH.js">
+		<link rel="modulepreload" href="/pyodide-files-serve/_app/immutable/entry/app.Bm1avagD.js">
+		<link rel="modulepreload" href="/pyodide-files-serve/_app/immutable/chunks/IHki7fMi.js">
+  </head>
+  <body data-sveltekit-preload-data="hover">
+    <script>
+      // Inicializar tema antes do Svelte para evitar flash (FOUC)
+      (function initTheme() {
+        try {
+          const savedTheme = localStorage.getItem('preferred-theme');
+          const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          const theme = savedTheme || systemTheme;
+          
+          document.documentElement.setAttribute('data-theme', theme);
+          document.documentElement.style.setProperty('color-scheme', theme);
+        } catch (e) {
+          // Fallback para tema claro se houver erro
+          document.documentElement.setAttribute('data-theme', 'light');
+          document.documentElement.style.setProperty('color-scheme', 'light');
+        }
+      })();
+    </script>
+    <div id="svelte">
+			<script>
+				{
+					__sveltekit_9xvvao = {
+						base: "/pyodide-files-serve",
+						assets: "/pyodide-files-serve"
+					};
+
+					const element = document.currentScript.parentElement;
+
+					Promise.all([
+						import("/pyodide-files-serve/_app/immutable/entry/start.C9kxkr_z.js"),
+						import("/pyodide-files-serve/_app/immutable/entry/app.Bm1avagD.js")
+					]).then(([kit, app]) => {
+						kit.start(app, element);
+					});
+				}
+			</script>
+		</div>
+  </body>
+</html>
