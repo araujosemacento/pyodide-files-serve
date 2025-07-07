@@ -4,11 +4,11 @@ export async function load({ fetch }) {
   try {
     // Carrega configuração do arquivo YAML
     const response = await fetch('/config.yml');
-    
+
     if (!response.ok) {
       throw new Error('Config file not found');
     }
-    
+
     const configContent = await response.text();
     const config = yaml.load(configContent);
 
