@@ -57,7 +57,7 @@
   <button
     class="settings-trigger"
     on:click={toggleDropdown}
-    aria-label="Settings"
+    aria-label={$_("accessibility.settings", { default: "Settings" })}
     aria-expanded={isOpen}
   >
     <span class="current-selection">

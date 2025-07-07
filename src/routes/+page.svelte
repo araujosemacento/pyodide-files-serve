@@ -36,6 +36,14 @@
       const savedLanguage = localStorage.getItem("preferred-language");
       if (savedLanguage) {
         locale.set(savedLanguage);
+        // Atualizar o atributo lang do HTML para corresponder
+        document.documentElement.lang = savedLanguage === "pt" ? "pt-BR" : "en";
+      } else {
+        // Se não há idioma salvo, usar detecção automática (já feita no app.html)
+        // mas garantir que o store esteja sincronizado
+        const currentLang = document.documentElement.lang;
+        const detectedLang = currentLang.startsWith("pt") ? "pt" : "en";
+        locale.set(detectedLang);
       }
     }
 
@@ -297,14 +305,12 @@
     <div class="console-demo-section">
       <div class="demo-card">
         <div class="demo-icon">🐍</div>
-        <h3>Experimente o Console Python</h3>
+        <h3>{$_("console_demo.title")}</h3>
         <p>
-          Teste código Python diretamente no seu navegador com o console
-          interativo do Pyodide. Execute bibliotecas científicas, manipule dados
-          e explore as funcionalidades do Python sem instalação local.
+          {$_("console_demo.description")}
         </p>
         <a href={createUrl("/files/console.html")} class="demo-button">
-          <span>🚀 Experimente Agora</span>
+          <span>{$_("console_demo.button_text")}</span>
           <svg
             width="20"
             height="20"
@@ -321,15 +327,15 @@
         <div class="demo-features">
           <div class="feature-item">
             <span class="feature-icon">⚡</span>
-            <span>Execução instantânea</span>
+            <span>{$_("console_demo.features.instant_execution")}</span>
           </div>
           <div class="feature-item">
             <span class="feature-icon">📊</span>
-            <span>Bibliotecas científicas</span>
+            <span>{$_("console_demo.features.scientific_libraries")}</span>
           </div>
           <div class="feature-item">
             <span class="feature-icon">🔧</span>
-            <span>Sem configuração</span>
+            <span>{$_("console_demo.features.no_configuration")}</span>
           </div>
         </div>
       </div>
@@ -337,39 +343,35 @@
 
     <!-- Seção Arquivos Principais -->
     <div class="main-files-section">
-      <h3>📦 Arquivos Principais do Pyodide</h3>
+      <h3>{$_("main_files.title")}</h3>
       <p class="section-description">
-        Escolha a versão mais adequada para seu projeto. Ambas oferecem a mesma
-        funcionalidade, diferindo apenas no sistema de módulos utilizado.
+        {$_("main_files.description")}
       </p>
 
       <div class="files-grid">
         <div class="file-card-main">
           <div class="file-header-main">
             <div class="file-icon-main">📄</div>
-            <div class="file-type-badge commonjs">CommonJS</div>
+            <div class="file-type-badge commonjs">
+              {$_("main_files.commonjs.badge")}
+            </div>
           </div>
-          <h4>pyodide.js</h4>
+          <h4>{$_("main_files.commonjs.title")}</h4>
           <p>
-            Versão CommonJS compatível com sistemas tradicionais como Node.js,
-            Webpack e Browserify. Ideal para projetos existentes que já utilizam <code
-              >require()</code
-            >.
+            {$_("main_files.commonjs.description")}
           </p>
           <div class="compatibility-info">
-            <h6>🔧 Compatibilidade:</h6>
+            <h6>{$_("main_files.commonjs.compatibility")}</h6>
             <ul>
-              <li>✅ Node.js com require()</li>
-              <li>✅ Webpack 4 e 5</li>
-              <li>✅ Browserify</li>
-              <li>✅ Parcel (modo CommonJS)</li>
-              <li>⚠️ Navegadores (com bundler)</li>
+              {#each $_("main_files.commonjs.compatibility_items") as item}
+                <li>{item}</li>
+              {/each}
             </ul>
           </div>
           <div class="usage-example">
-            <h6>💻 Exemplo de uso:</h6>
+            <h6>{$_("main_files.commonjs.usage_example")}</h6>
             <code class="code-block"
-              >const &#123;loadPyodide&#125; = require('./pyodide.js');</code
+              >{$_("main_files.commonjs.usage_code")}</code
             >
           </div>
           <div class="file-actions">
@@ -390,7 +392,7 @@
                 <polyline points="15,3 21,3 21,9" />
                 <line x1="10" y1="14" x2="21" y2="3" />
               </svg>
-              Acessar Arquivo
+              {$_("main_files.actions.access_file")}
             </a>
             <button
               class="copy-url"
@@ -409,7 +411,7 @@
                 <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
                 <path d="m4 16-2-2v-10c0-1.1.9-2 2-2h10l2 2" />
               </svg>
-              Copiar URL
+              {$_("main_files.actions.copy_url")}
             </button>
           </div>
         </div>
@@ -417,37 +419,34 @@
         <div class="file-card-main">
           <div class="file-header-main">
             <div class="file-icon-main">🔷</div>
-            <div class="file-type-badge esmodule">ES Module</div>
+            <div class="file-type-badge esmodule">
+              {$_("main_files.esmodule.badge")}
+            </div>
           </div>
-          <h4>pyodide.mjs</h4>
+          <h4>{$_("main_files.esmodule.title")}</h4>
           <p>
-            Versão ES Module moderna com suporte nativo a import/export.
-            Recomendada para aplicações modernas e oferece melhor otimização com
-            tree-shaking.
+            {$_("main_files.esmodule.description")}
           </p>
           <div class="compatibility-info">
-            <h6>🚀 Compatibilidade:</h6>
+            <h6>{$_("main_files.esmodule.compatibility")}</h6>
             <ul>
-              <li>✅ Navegadores modernos (nativo)</li>
-              <li>✅ Vite</li>
-              <li>✅ Rollup</li>
-              <li>✅ Webpack 5 (ESM)</li>
-              <li>✅ Node.js (com type: "module")</li>
+              {#each $_("main_files.esmodule.compatibility_items") as item}
+                <li>{item}</li>
+              {/each}
             </ul>
           </div>
           <div class="usage-example">
-            <h6>💻 Exemplo de uso:</h6>
+            <h6>{$_("main_files.esmodule.usage_example")}</h6>
             <code class="code-block"
-              >import &#123;loadPyodide&#125; from './pyodide.mjs';</code
+              >{$_("main_files.esmodule.usage_code")}</code
             >
           </div>
           <div class="benefits-info">
-            <h6>⚡ Benefícios:</h6>
+            <h6>{$_("main_files.esmodule.benefits")}</h6>
             <ul>
-              <li>🌲 Tree-shaking para menor bundle</li>
-              <li>⚡ Carregamento assíncrono</li>
-              <li>🔄 Import dinâmico</li>
-              <li>📱 Melhor para PWAs</li>
+              {#each $_("main_files.esmodule.benefits_items") as item}
+                <li>{item}</li>
+              {/each}
             </ul>
           </div>
           <div class="file-actions">
@@ -468,7 +467,7 @@
                 <polyline points="15,3 21,3 21,9" />
                 <line x1="10" y1="14" x2="21" y2="3" />
               </svg>
-              Acessar Arquivo
+              {$_("main_files.actions.access_file")}
             </a>
             <button
               class="copy-url"
@@ -487,7 +486,7 @@
                 <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
                 <path d="m4 16-2-2v-10c0-1.1.9-2 2-2h10l2 2" />
               </svg>
-              Copiar URL
+              {$_("main_files.actions.copy_url")}
             </button>
           </div>
         </div>
@@ -496,28 +495,25 @@
       <div class="info-cards">
         <div class="info-card">
           <div class="card-icon">🔧</div>
-          <h5>CommonJS (pyodide.js)</h5>
+          <h5>{$_("info_cards.commonjs.title")}</h5>
           <p>
-            Sistema de módulos tradicional, amplamente suportado e estável.
-            Perfeito para projetos existentes e ambientes Node.js que utilizam <code
-              >require()</code
-            >.
+            {$_("info_cards.commonjs.description")}
           </p>
           <div class="card-pros-cons">
             <div class="pros">
-              <strong>✅ Vantagens:</strong>
+              <strong>{$_("info_cards.commonjs.advantages")}</strong>
               <ul>
-                <li>Compatibilidade ampla</li>
-                <li>Suporte legado</li>
-                <li>Estabilidade comprovada</li>
+                {#each $_("info_cards.commonjs.advantages_items") as item}
+                  <li>{item}</li>
+                {/each}
               </ul>
             </div>
             <div class="cons">
-              <strong>⚠️ Limitações:</strong>
+              <strong>{$_("info_cards.commonjs.limitations")}</strong>
               <ul>
-                <li>Sem tree-shaking</li>
-                <li>Bundle size maior</li>
-                <li>Carregamento síncrono</li>
+                {#each $_("info_cards.commonjs.limitations_items") as item}
+                  <li>{item}</li>
+                {/each}
               </ul>
             </div>
           </div>
@@ -525,27 +521,25 @@
 
         <div class="info-card">
           <div class="card-icon">⚡</div>
-          <h5>ES Module (pyodide.mjs)</h5>
+          <h5>{$_("info_cards.esmodule.title")}</h5>
           <p>
-            Padrão moderno de módulos JavaScript com suporte nativo em
-            navegadores. Oferece melhor performance e é o futuro do JavaScript.
+            {$_("info_cards.esmodule.description")}
           </p>
           <div class="card-pros-cons">
             <div class="pros">
-              <strong>✅ Vantagens:</strong>
+              <strong>{$_("info_cards.esmodule.advantages")}</strong>
               <ul>
-                <li>Tree-shaking automático</li>
-                <li>Import dinâmico</li>
-                <li>Melhor performance</li>
-                <li>Suporte nativo em browsers</li>
+                {#each $_("info_cards.esmodule.advantages_items") as item}
+                  <li>{item}</li>
+                {/each}
               </ul>
             </div>
             <div class="cons">
-              <strong>⚠️ Requisitos:</strong>
+              <strong>{$_("info_cards.esmodule.requirements")}</strong>
               <ul>
-                <li>Navegadores modernos</li>
-                <li>Bundler com suporte ESM</li>
-                <li>Node.js 14+ (type: "module")</li>
+                {#each $_("info_cards.esmodule.requirements_items") as item}
+                  <li>{item}</li>
+                {/each}
               </ul>
             </div>
           </div>
@@ -553,24 +547,22 @@
 
         <div class="info-card decision-card">
           <div class="card-icon">🤔</div>
-          <h5>Como Escolher?</h5>
+          <h5>{$_("info_cards.decision.title")}</h5>
           <div class="decision-matrix">
             <div class="decision-option">
-              <strong>📄 Use CommonJS se:</strong>
+              <strong>{$_("info_cards.decision.commonjs_when")}</strong>
               <ul>
-                <li>Projeto existente com Webpack 4</li>
-                <li>Ambiente Node.js tradicional</li>
-                <li>Precisa de máxima compatibilidade</li>
-                <li>Equipe ainda não migrou para ESM</li>
+                {#each $_("info_cards.decision.commonjs_scenarios") as scenario}
+                  <li>{scenario}</li>
+                {/each}
               </ul>
             </div>
             <div class="decision-option">
-              <strong>🔷 Use ES Module se:</strong>
+              <strong>{$_("info_cards.decision.esmodule_when")}</strong>
               <ul>
-                <li>Projeto novo ou moderno</li>
-                <li>Vite, Rollup ou Webpack 5</li>
-                <li>Performance é prioridade</li>
-                <li>Desenvolvimento para navegadores</li>
+                {#each $_("info_cards.decision.esmodule_scenarios") as scenario}
+                  <li>{scenario}</li>
+                {/each}
               </ul>
             </div>
           </div>
@@ -638,7 +630,7 @@
               </div>
               {#if file.size}
                 <div class="file-size">
-                  📊 {formatFileSize(file.size)}
+                  📊 {formatFileSize(file.size, $_)}
                 </div>
               {/if}
             </div>
@@ -1349,7 +1341,7 @@
     font-size: 0.9rem;
   }
 
-  .info-card code {
+  :global(.info-card) code {
     background: var(--color-bg-3);
     color: var(--color-text);
     padding: 0.25rem 0.5rem;

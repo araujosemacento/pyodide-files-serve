@@ -25,7 +25,9 @@
   <select
     bind:value={$locale}
     on:change={(e) => changeLanguage(e.target.value)}
-    aria-label="Select language"
+    aria-label={$_("accessibility.select_language", {
+      default: "Select language",
+    })}
   >
     {#each languages as lang}
       <option value={lang.code}>

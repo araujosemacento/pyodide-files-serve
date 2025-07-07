@@ -163,5 +163,15 @@
     "title": "Tema",
     "light": "Claro",
     "dark": "Escuro"
+  },
+  "accessibility": {
+    "settings": "Configurações",
+    "select_language": "Selecionar idioma"
+  },
+  "file_sizes": {
+    "bytes": "Bytes",
+    "kb": "KB",
+    "mb": "MB",
+    "gb": "GB"
   }
 }

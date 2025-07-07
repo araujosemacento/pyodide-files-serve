@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="%sveltekit.assets%/favicon.svg" />
@@ -9,6 +9,56 @@
   </head>
   <body data-sveltekit-preload-data="hover">
     <script>
+      // Detectar e configurar idioma automaticamente
+      (function initLanguage() {
+        try {
+          // Verificar se já existe uma preferência salva
+          const savedLanguage = localStorage.getItem('preferred-language');
+          
+          if (savedLanguage) {
+            document.documentElement.lang = savedLanguage === 'pt' ? 'pt-BR' : 'en';
+            return;
+          }
+          
+          // Detectar idioma do navegador/sistema
+          const userLanguages = navigator.languages || [navigator.language || navigator.userLanguage];
+          let detectedLanguage = 'en'; // fallback padrão
+          
+          // Verificar se algum dos idiomas preferidos é português
+          for (const lang of userLanguages) {
+            const langCode = lang.toLowerCase();
+            if (langCode.startsWith('pt')) {
+              detectedLanguage = 'pt';
+              document.documentElement.lang = 'pt-BR';
+              break;
+            } else if (langCode.startsWith('en')) {
+              detectedLanguage = 'en';
+              document.documentElement.lang = 'en';
+              break;
+            }
+          }
+          
+          // Salvar a detecção para próximas visitas
+          localStorage.setItem('preferred-language', detectedLanguage);
+          
+          // Configurar meta tags de idioma
+          const metaLang = document.querySelector('meta[name="language"]');
+          if (metaLang) {
+            metaLang.content = detectedLanguage === 'pt' ? 'pt-BR' : 'en';
+          } else {
+            const meta = document.createElement('meta');
+            meta.name = 'language';
+            meta.content = detectedLanguage === 'pt' ? 'pt-BR' : 'en';
+            document.head.appendChild(meta);
+          }
+          
+        } catch (e) {
+          // Fallback para inglês em caso de erro
+          document.documentElement.lang = 'en';
+          localStorage.setItem('preferred-language', 'en');
+        }
+      })();
+
       // Inicializar tema antes do Svelte para evitar flash (FOUC)
       (function initTheme() {
         try {

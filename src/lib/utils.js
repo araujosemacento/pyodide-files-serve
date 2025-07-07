@@ -1,11 +1,22 @@
 /**
  * @param {number} bytes
+ * @param {function} [t] - Translation function (optional for backwards compatibility)
  */
-export function formatFileSize(bytes) {
-  if (bytes === 0) return '0 Bytes';
+// @ts-ignore
+export function formatFileSize(bytes, t = null) {
+  if (bytes === 0) {
+    return t ? `0 ${t('file_sizes.bytes', { default: 'Bytes' })}` : '0 Bytes';
+  }
 
   const k = 1024;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const sizes = t
+    ? [
+      t('file_sizes.bytes', { default: 'Bytes' }),
+      t('file_sizes.kb', { default: 'KB' }),
+      t('file_sizes.mb', { default: 'MB' }),
+      t('file_sizes.gb', { default: 'GB' })
+    ]
+    : ['Bytes', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
 
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
