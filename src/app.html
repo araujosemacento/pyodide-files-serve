@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%sveltekit.assets%/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pyodide v0.28.0 Backup Repository</title>
+    %sveltekit.head%
+  </head>
+  <body data-sveltekit-preload-data="hover">
+    <script>
+      // Inicializar tema antes do Svelte para evitar flash (FOUC)
+      (function initTheme() {
+        try {
+          const savedTheme = localStorage.getItem('preferred-theme');
+          const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          const theme = savedTheme || systemTheme;
+          
+          document.documentElement.setAttribute('data-theme', theme);
+          document.documentElement.style.setProperty('color-scheme', theme);
+        } catch (e) {
+          // Fallback para tema claro se houver erro
+          document.documentElement.setAttribute('data-theme', 'light');
+          document.documentElement.style.setProperty('color-scheme', 'light');
+        }
+      })();
+    </script>
+    <div id="svelte">%sveltekit.body%</div>
+  </body>
+</html>

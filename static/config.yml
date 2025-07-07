@@ -1,0 +1,88 @@
+title: "Pyodide v0.28.0 - Repositório Backup"
+description: "Backup da distribuição Pyodide v0.28.0 disponível como salvaguarda para continuidade de projetos"
+baseUrl: ""
+
+# Configurações dos arquivos
+files:
+  - name: "numpy-2.2.5-cp313-cp313-pyodide_2025_0_wasm32.whl"
+    type: "file"
+    size: 3109648
+    path: "/files/numpy-2.2.5-cp313-cp313-pyodide_2025_0_wasm32.whl"
+    modified: "2025-07-07T00:28:59.1911726-03:00"
+    category: "Computação Científica"
+
+  - name: "pandas-2.3.0-cp313-cp313-pyodide_2025_0_wasm32.whl"
+    type: "file"
+    size: 5291112
+    path: "/files/pandas-2.3.0-cp313-cp313-pyodide_2025_0_wasm32.whl"
+    modified: "2025-07-07T00:28:59.3111747-03:00"
+    category: "Análise de Dados"
+
+  - name: "matplotlib-3.8.4-cp313-cp313-pyodide_2025_0_wasm32.whl"
+    type: "file"
+    size: 6713515
+    path: "/files/matplotlib-3.8.4-cp313-cp313-pyodide_2025_0_wasm32.whl"
+    modified: "2025-07-07T00:28:59.0356809-03:00"
+    category: "Visualização"
+
+  - name: "scipy-1.14.1-cp313-cp313-pyodide_2025_0_wasm32.whl"
+    type: "file"
+    size: 13258840
+    path: "/files/scipy-1.14.1-cp313-cp313-pyodide_2025_0_wasm32.whl"
+    modified: "2025-07-07T00:28:59.5663945-03:00"
+    category: "Computação Científica"
+
+  - name: "opencv_python-4.11.0.86-cp313-cp313-pyodide_2025_0_wasm32.whl"
+    type: "file"
+    size: 11772746
+    path: "/files/opencv_python-4.11.0.86-cp313-cp313-pyodide_2025_0_wasm32.whl"
+    modified: "2025-07-07T00:28:59.2664103-03:00"
+    category: "Visão Computacional"
+
+  - name: "scikit_learn-1.7.0-cp313-cp313-pyodide_2025_0_wasm32.whl"
+    type: "file"
+    size: 6385309
+    path: "/files/scikit_learn-1.7.0-cp313-cp313-pyodide_2025_0_wasm32.whl"
+    modified: "2025-07-07T00:28:59.4870098-03:00"
+    category: "Machine Learning"
+
+  - name: "pyodide.js"
+    type: "file"
+    size: 16817
+    path: "/files/pyodide.js"
+    modified: "2025-07-07T00:28:59.5520831-03:00"
+    category: "Core Pyodide"
+
+  - name: "pyodide.asm.wasm"
+    type: "file"
+    size: 8645010
+    path: "/files/pyodide.asm.wasm"
+    modified: "2025-07-07T00:28:59.5490595-03:00"
+    category: "Core Pyodide"
+
+# Configurações de exibição
+display:
+  show_hidden: false
+  items_per_page: 50
+  default_sort: "name"
+  categories:
+    - "Core Pyodide"
+    - "Computação Científica"
+    - "Análise de Dados"
+    - "Visualização"
+    - "Machine Learning"
+    - "Visão Computacional"
+    - "Desenvolvimento Web"
+    - "Outros"
+
+# Tipos de arquivo permitidos
+allowed_extensions:
+  - ".whl"
+  - ".tar"
+  - ".gz"
+  - ".zip"
+  - ".js"
+  - ".wasm"
+  - ".json"
+  - ".html"
+  - ".md"

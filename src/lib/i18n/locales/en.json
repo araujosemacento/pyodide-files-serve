@@ -1,0 +1,49 @@
+{
+  "title": "Pyodide v0.28.0 - Backup Repository",
+  "description": "Backup of Pyodide v0.28.0 distribution available as safeguard for project continuity",
+  "home": "Home",
+  "backup_pyodide": "pyodide v0.28.0 backup",
+  "warning_banner": {
+    "title": "⚠️ Backup Repository",
+    "description": "This is an <strong>unofficial backup</strong> of Pyodide v0.28.0.",
+    "access_url": "Access URL:",
+    "recommendation": "For new projects, always use the <a href=\"https://pyodide.org\" target=\"_blank\" rel=\"noopener\">latest official version</a>."
+  },
+  "search_placeholder": "🔍 Search packages...",
+  "category": "Category:",
+  "all_categories": "All categories",
+  "stats": {
+    "packages_available": "packages available",
+    "displayed": "displayed"
+  },
+  "no_results": {
+    "title": "🤷‍♂️ No files found",
+    "message": "Try adjusting your search filters."
+  },
+  "date_not_available": "Date not available",
+  "categories": {
+    "Core Pyodide": "Core Pyodide",
+    "Scientific Computing": "Scientific Computing",
+    "Data Analysis": "Data Analysis",
+    "Visualization": "Visualization",
+    "Machine Learning": "Machine Learning",
+    "Computer Vision": "Computer Vision",
+    "Web Development": "Web Development",
+    "Others": "Others"
+  },
+  "footer": {
+    "backup_text": "🛡️ Pyodide v0.28.0 backup repository • Powered by <strong>SvelteKit</strong>",
+    "official_project": "Official Pyodide Project",
+    "disclaimer": "Backup maintained for project continuity. Not affiliated with the official project."
+  },
+  "language_selector": {
+    "title": "Language",
+    "english": "English",
+    "portuguese": "Português"
+  },
+  "theme_selector": {
+    "title": "Theme",
+    "light": "Light",
+    "dark": "Dark"
+  }
+}
