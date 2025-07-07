@@ -20,10 +20,6 @@ pids
 .DS_Store
 Thumbs.db
 
-# IDEs
-.vscode/
-.idea/
-
 # Temporary files
 *.tmp
 *.temp

@@ -1,5 +1,4 @@
 <script>
-  // @ts-nocheck
   import { locale, _ } from "../i18n/index.js";
   import { theme, toggleTheme } from "../stores/theme.js";
   import { onMount } from "svelte";
@@ -14,6 +13,7 @@
     languages.find((lang) => lang.code === $locale) || languages[0];
 
   // Atualizar idioma atual quando o locale muda
+  // @ts-ignore
   $: currentLanguage =
     languages.find((lang) => lang.code === $locale) || languages[0];
 
@@ -21,6 +21,9 @@
     isOpen = !isOpen;
   }
 
+  /**
+   * @param {{ code: any; name?: string; flag?: string; }} lang
+   */
   function changeLanguage(lang) {
     locale.set(lang.code);
     isOpen = false;
@@ -31,6 +34,9 @@
     }
   }
 
+  /**
+   * @param {{ target: { closest: (arg0: string) => any; }; }} event
+   */
   function handleClickOutside(event) {
     if (!event.target.closest(".settings-panel")) {
       isOpen = false;
@@ -38,8 +44,10 @@
   }
 
   onMount(() => {
+    // @ts-ignore
     document.addEventListener("click", handleClickOutside);
     return () => {
+      // @ts-ignore
       document.removeEventListener("click", handleClickOutside);
     };
   });
@@ -62,7 +70,7 @@
         {/if}
       </span>
     </span>
-    <span class="chevron" class:rotated={isOpen}> ⌄ </span>
+    <span class="chevron" class:rotated={isOpen}>⮟</span>
   </button>
 
   <div class="dropdown" class:open={isOpen}>
@@ -129,8 +137,11 @@
 
 <style>
   .settings-panel {
-    position: relative;
-    z-index: 1000;
+    width: fit-content;
+    position: sticky;
+    pointer-events: all;
+    top: calc(100% - 5rem);
+    margin: 0 0 0 85%;
   }
 
   .settings-trigger {
@@ -145,8 +156,7 @@
     cursor: pointer;
     transition: all var(--transition-normal);
     font-size: 0.9rem;
-    min-width: 100px;
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--shadow-lg);
     color: var(--color-text);
     position: relative;
   }
@@ -208,7 +218,7 @@
 
   .dropdown {
     position: absolute;
-    top: calc(100% + 0.75rem);
+    bottom: calc(100% + 0.75rem);
     right: 0;
     background: var(--color-bg-1);
     border: 2px solid var(--color-bg-3);
@@ -218,10 +228,10 @@
     -webkit-backdrop-filter: blur(16px);
     opacity: 0;
     visibility: hidden;
-    transform: translateY(-10px) scale(0.95);
+    transform: translateY(10px) scale(0.95);
     transition: all var(--transition-slow) cubic-bezier(0.4, 0, 0.2, 1);
-    min-width: 260px;
-    max-width: 90vw;
+    width: auto;
+    height: auto;
     overflow: hidden;
     z-index: 1000;
     color: var(--color-text);
@@ -324,18 +334,13 @@
     opacity: 0.9;
     font-weight: bold;
   }
-
   /* Responsividade aprimorada */
   @media (max-width: 768px) {
-    .settings-panel {
-      position: relative;
-    }
-
     .dropdown {
       right: 0;
       left: auto;
-      min-width: 280px;
-      max-width: calc(100vw - 2rem);
+      max-width: calc(100vw - 3rem);
+      width: auto;
     }
 
     .dropdown-content {
@@ -350,50 +355,13 @@
 
   @media (max-width: 480px) {
     .dropdown {
-      right: -1rem;
+      right: 0;
       left: auto;
-      min-width: calc(100vw - 2rem);
+      max-width: calc(100vw - 2rem);
     }
-  }
 
-  /* Melhorar contraste no tema escuro */
-  [data-theme="dark"] .dropdown {
-    border-color: var(--color-bg-3);
-    background: var(--color-bg-1);
-    box-shadow:
-      var(--shadow-xl),
-      0 0 0 1px rgba(255, 255, 255, 0.05);
-  }
-
-  [data-theme="dark"] .settings-trigger {
-    background: var(--color-bg-1);
-    border-color: var(--color-bg-3);
-    color: var(--color-text);
-  }
-
-  [data-theme="dark"] .settings-trigger:hover {
-    background: var(--color-bg-2);
-    border-color: var(--color-theme-1);
-  }
-
-  [data-theme="dark"] .option {
-    color: var(--color-text);
-  }
-
-  [data-theme="dark"] .option:hover {
-    background: var(--color-bg-2);
-    color: var(--color-text);
-  }
-
-  [data-theme="dark"] .section-title {
-    color: var(--color-theme-1);
-  }
-
-  [data-theme="dark"] .chevron {
-    color: var(--color-text-muted);
-  }
-
-  [data-theme="dark"] .settings-trigger[aria-expanded="true"] .chevron {
-    color: var(--color-theme-1);
+    .settings-panel {
+      margin: 0 0 0 70%;
+    }
   }
 </style>

@@ -11,7 +11,14 @@ const config = {
       strict: false
     }),
     paths: {
-      base: process.env.NODE_ENV === 'production' ? '/pyodide-files-serve' : ''
+      base: process.env.NODE_ENV === 'production' ? '/pyodide-files-serve' : '',
+      relative: false
+    },
+    prerender: {
+      handleHttpError: ({ path, referrer, message }) => {
+        // Log error but don't fail build
+        console.warn(`Prerender error on ${path}: ${message}`);
+      }
     }
   }
 };

@@ -1,20 +1,50 @@
 import yaml from 'js-yaml';
 import { base } from '$app/paths';
 
-export async function load({ fetch }) {
+// @ts-ignore
+export async function load({ fetch, url }) {
   try {
-    // Carrega configuração do arquivo YAML (agora sem problemas de CORS)
-    const response = await fetch(`${base}/config.yml`);
+    // Construir URL baseado no ambiente
+    const configUrl = base ? `${base}/config.yml` : '/config.yml';
+
+    console.log('Tentando carregar config de:', configUrl);
+
+    // Carrega configuração do arquivo YAML
+    const response = await fetch(configUrl);
 
     if (!response.ok) {
-      throw new Error('Config file not found');
+      console.warn(`Config não encontrado em ${configUrl}, tentando path absoluto`);
+      // Tentar path absoluto se o relativo falhar
+      const absoluteUrl = url.origin + (base || '') + '/config.yml';
+      const fallbackResponse = await fetch(absoluteUrl);
+
+      if (!fallbackResponse.ok) {
+        throw new Error('Config file not found in any location');
+      }
+
+      const configContent = await fallbackResponse.text();
+      const config = yaml.load(configContent);
+
+      return {
+        config: {
+          // @ts-ignore
+          ...config,
+          baseUrl: base || ''
+        },
+        // @ts-ignore
+        files: config.files || []
+      };
     }
 
     const configContent = await response.text();
     const config = yaml.load(configContent);
 
     return {
-      config,
+      config: {
+        // @ts-ignore
+        ...config,
+        baseUrl: base || ''
+      },
       // @ts-ignore
       files: config.files || []
     };

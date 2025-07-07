@@ -9,7 +9,125 @@
     "access_url": "URL de acesso:",
     "recommendation": "Para novos projetos, utilize sempre a <a href=\"https://pyodide.org\" target=\"_blank\" rel=\"noopener\">versão oficial mais recente</a>."
   },
-  "search_placeholder": "🔍 Buscar pacotes...",
+  "console_demo": {
+    "title": "Experimente o Console Python",
+    "description": "Teste código Python diretamente no seu navegador com o console interativo do Pyodide. Execute bibliotecas científicas, manipule dados e explore as funcionalidades do Python sem instalação local.",
+    "button_text": "🚀 Experimente Agora",
+    "features": {
+      "instant_execution": "Execução instantânea",
+      "scientific_libraries": "Bibliotecas científicas",
+      "no_configuration": "Sem configuração"
+    }
+  },
+  "main_files": {
+    "title": "📦 Arquivos Principais do Pyodide",
+    "description": "Escolha a versão mais adequada para seu projeto. Ambas oferecem a mesma funcionalidade, diferindo apenas no sistema de módulos utilizado.",
+    "commonjs": {
+      "title": "pyodide.js",
+      "badge": "CommonJS",
+      "description": "Versão CommonJS compatível com sistemas tradicionais como Node.js, Webpack e Browserify. Ideal para projetos existentes que já utilizam require().",
+      "compatibility": "🔧 Compatibilidade:",
+      "compatibility_items": [
+        "✅ Node.js com require()",
+        "✅ Webpack 4 e 5",
+        "✅ Browserify",
+        "✅ Parcel (modo CommonJS)",
+        "⚠️ Navegadores (com bundler)"
+      ],
+      "usage_example": "💻 Exemplo de uso:",
+      "usage_code": "const {loadPyodide} = require('./pyodide.js');"
+    },
+    "esmodule": {
+      "title": "pyodide.mjs",
+      "badge": "ES Module",
+      "description": "Versão ES Module moderna com suporte nativo a import/export. Recomendada para aplicações modernas e oferece melhor otimização com tree-shaking.",
+      "compatibility": "🚀 Compatibilidade:",
+      "compatibility_items": [
+        "✅ Navegadores modernos (nativo)",
+        "✅ Vite",
+        "✅ Rollup",
+        "✅ Webpack 5 (ESM)",
+        "✅ Node.js (com type: \"module\")"
+      ],
+      "usage_example": "💻 Exemplo de uso:",
+      "usage_code": "import {loadPyodide} from './pyodide.mjs';",
+      "benefits": "⚡ Benefícios:",
+      "benefits_items": [
+        "🌲 Tree-shaking para menor bundle",
+        "⚡ Carregamento assíncrono",
+        "🔄 Import dinâmico",
+        "📱 Melhor para PWAs"
+      ]
+    },
+    "actions": {
+      "access_file": "Acessar Arquivo",
+      "copy_url": "Copiar URL",
+      "copied": "Copiado!"
+    }
+  },
+  "info_cards": {
+    "commonjs": {
+      "title": "CommonJS (pyodide.js)",
+      "description": "Sistema de módulos tradicional, amplamente suportado e estável. Perfeito para projetos existentes e ambientes Node.js que utilizam require().",
+      "advantages": "✅ Vantagens:",
+      "advantages_items": [
+        "Compatibilidade ampla",
+        "Suporte legado",
+        "Estabilidade comprovada"
+      ],
+      "limitations": "⚠️ Limitações:",
+      "limitations_items": [
+        "Sem tree-shaking",
+        "Bundle size maior",
+        "Carregamento síncrono"
+      ]
+    },
+    "esmodule": {
+      "title": "ES Module (pyodide.mjs)",
+      "description": "Padrão moderno de módulos JavaScript com suporte nativo em navegadores. Oferece melhor performance e é o futuro do JavaScript.",
+      "advantages": "✅ Vantagens:",
+      "advantages_items": [
+        "Tree-shaking automático",
+        "Import dinâmico",
+        "Melhor performance",
+        "Suporte nativo em browsers"
+      ],
+      "requirements": "⚠️ Requisitos:",
+      "requirements_items": [
+        "Navegadores modernos",
+        "Bundler com suporte ESM",
+        "Node.js 14+ (type: \"module\")"
+      ]
+    },
+    "decision": {
+      "title": "Como Escolher?",
+      "commonjs_when": "📄 Use CommonJS se:",
+      "commonjs_scenarios": [
+        "Projeto existente com Webpack 4",
+        "Ambiente Node.js tradicional",
+        "Precisa de máxima compatibilidade",
+        "Equipe ainda não migrou para ESM"
+      ],
+      "esmodule_when": "� Use ES Module se:",
+      "esmodule_scenarios": [
+        "Projeto novo ou moderno",
+        "Vite, Rollup ou Webpack 5",
+        "Performance é prioridade",
+        "Desenvolvimento para navegadores"
+      ]
+    }
+  },
+  "loading": {
+    "title": "🐍 Carregando Pyodide...",
+    "subtitle": "Preparando o ambiente Python",
+    "steps": {
+      "initializing": "Inicializando...",
+      "loading_files": "Carregando arquivos...",
+      "configuring": "Configurando ambiente...",
+      "almost_ready": "Quase pronto..."
+    }
+  },
+  "search_placeholder": "�🔍 Buscar pacotes...",
   "category": "Categoria:",
   "all_categories": "Todas as categorias",
   "stats": {
@@ -23,13 +141,13 @@
   "date_not_available": "Data não disponível",
   "categories": {
     "Core Pyodide": "Core Pyodide",
-    "Scientific Computing": "Computação Científica",
-    "Data Analysis": "Análise de Dados",
-    "Visualization": "Visualização",
+    "Computação Científica": "Computação Científica",
+    "Análise de Dados": "Análise de Dados",
+    "Visualização": "Visualização",
     "Machine Learning": "Machine Learning",
-    "Computer Vision": "Visão Computacional",
-    "Web Development": "Desenvolvimento Web",
-    "Others": "Outros"
+    "Visão Computacional": "Visão Computacional",
+    "Desenvolvimento Web": "Desenvolvimento Web",
+    "Outros": "Outros"
   },
   "footer": {
     "backup_text": "🛡️ Repositório de backup do Pyodide v0.28.0 • Powered by <strong>SvelteKit</strong>",
