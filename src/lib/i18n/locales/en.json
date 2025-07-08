@@ -189,5 +189,17 @@
     "language_distribution": "Language Distribution",
     "top_files": "Top 10 Most Accessed Files",
     "footer_text": "Analytics updated in real time through Pantry Cloud"
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page",
+    "of": "of",
+    "showing": "Showing",
+    "to": "to",
+    "results": "results",
+    "first": "First",
+    "last": "Last",
+    "goto_page": "Go to page"
   }
 }

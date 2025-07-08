@@ -2457,7 +2457,7 @@ files:
     category: Outros
 display:
   show_hidden: false
-  items_per_page: 50
+  items_per_page: 20
   default_sort: name
   categories:
     - Core Pyodide

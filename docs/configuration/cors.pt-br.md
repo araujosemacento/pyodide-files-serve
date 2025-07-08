@@ -2,29 +2,13 @@
 
 ## 📋 Resumo
 
-Este documento descreve a configuração de CORS (Cross-Origin Resource Sharing) para o projeto, cobrindo desenvolvimento e produção com headers específicos para cada ambiente.
+Este documento descreve a configuração de CORS (Cross-Origin Resource Sharing) para o projeto, cobrindo desenvolvimento e produção.
 
 ## 🔧 Implementação
 
 ### Desenvolvimento Local
 
-#### Vite Config (`vite.config.js`)
-
-Headers permissivos para desenvolvimento local:
-
-```javascript
-// Desenvolvimento: Headers permissivos para testes locais
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
-  'Access-Control-Max-Age': '86400' // Cache preflight por 24h
-};
-```
-
-#### Hooks SvelteKit (`src/hooks.js`)
-
-Configuração adicional no SvelteKit:
+Configuração automática em `src/hooks.js`:
 
 ```javascript
 // Configuração de CORS para desenvolvimento
@@ -37,23 +21,7 @@ if (dev) {
 
 ### Produção (GitHub Pages)
 
-#### Headers Restritivos
-
-Para produção, headers mais seguros limitados ao domínio específico:
-
-```javascript
-// Produção: Headers restritivos para GitHub Pages
-const corsHeaders = {
-  'Access-Control-Allow-Origin': 'https://araujosemacento.github.io',
-  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-  'Access-Control-Allow-Credentials': 'true'
-};
-```
-
-#### Sistema de Fallback
-
-O GitHub Pages tem limitações para headers CORS personalizados. A solução implementada:
+O GitHub Pages não permite configuração personalizada de headers CORS. A solução implementada:
 
 1. **Sistema de Fallback**: Analytics usa localStorage quando APIs externas falham
 2. **Detecção Automática**: Identifica erros de CORS e muda para fallback
@@ -79,27 +47,6 @@ if (response.status === 0 || errorText.includes('CORS')) {
   return this.handleLocalStorageRequest(method, data);
 }
 ```
-
-## 🔒 Segurança
-
-### Ambiente de Desenvolvimento
-
-- **Origin**: `*` (qualquer origem) - facilita testes locais
-- **Headers**: Amplos para desenvolvimento flexível
-- **Cache**: Preflight cache de 24h para performance
-
-### Ambiente de Produção
-
-- **Origin**: Restrito ao domínio GitHub Pages específico
-- **Credentials**: Habilitadas para autenticação segura
-- **Headers**: Limitados ao necessário para funcionamento
-
-## ✅ Status Atual
-
-- ✅ **Desenvolvimento**: CORS permissivo configurado
-- ✅ **Produção**: CORS restritivo e seguro
-- ✅ **Fallback**: Sistema resiliente implementado
-- ✅ **Analytics**: 100% funcional independente de CORS
 
 ## ✅ Status
 

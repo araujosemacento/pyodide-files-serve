@@ -8,14 +8,14 @@ Backup and safeguard the distribution of **Pyodide v0.28.0**, making the files a
 
 ### Main URLs
 
-- **pyodide.js**: `https://araujosemacento.github.io/pyodide-files-serve/files/pyodide.js`
-- **Interface**: `https://araujosemacento.github.io/pyodide-files-serve/`
+- **pyodide.js**: `[https://araujosemacento.github.io/pyodide-files-serve/files/pyodide.js](https://araujosemacento.github.io/pyodide-files-serve/files/pyodide.js)`
+- **Interface**: `[https://araujosemacento.github.io/pyodide-files-serve/](https://araujosemacento.github.io/pyodide-files-serve/)`
 
 ## 🚀 Quick Start
 
 ```bash
 # Clone and configure
-git clone https://github.com/araujosemacento/pyodide-files-serve.git
+git clone `https://github.com/araujosemacento/pyodide-files-serve.git`
 cd pyodide-files-serve
 npm install
 cp .env.example .env

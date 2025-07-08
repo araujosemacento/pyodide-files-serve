@@ -11,6 +11,7 @@
   import { _, locale, json } from "$lib/i18n/index.js";
   import SettingsPanel from "$lib/components/SettingsPanel.svelte";
   import DevToolsPanel from "$lib/components/DevToolsPanel.svelte";
+  import Pagination from "$lib/components/Pagination.svelte";
   import { base } from "$app/paths";
   import { browser } from "$app/environment";
   import { createUrl, createAbsoluteUrl } from "$lib/routing.js";
@@ -26,6 +27,11 @@
    * @type {string | any[]}
    */
   let filteredFiles = [];
+  
+  // Pagination state
+  let currentPage = 1;
+  let itemsPerPage = 20;
+  let paginatedFiles = [];
 
   // Estados de loading e transições
   let isLoading = true;
@@ -100,6 +106,12 @@
   $: $config = data.config;
   // @ts-ignore
   $: $files = data.files;
+  
+  // Update items per page from config
+  $: if ($config && $config.display && $config.display.items_per_page) {
+    itemsPerPage = $config.display.items_per_page;
+  }
+  
   $: {
     let filtered = $files;
 
@@ -122,6 +134,32 @@
     }
 
     filteredFiles = filtered;
+    
+    // Reset to first page when filters change
+    currentPage = 1;
+  }
+  
+  // Calculate paginated files
+  $: {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    paginatedFiles = filteredFiles.slice(startIndex, endIndex);
+  }
+  
+  // Handle page change
+  function handlePageChange(page) {
+    currentPage = page;
+    
+    // Scroll to top of file grid
+    if (browser) {
+      const fileGrid = document.querySelector('.file-grid');
+      if (fileGrid) {
+        fileGrid.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start' 
+        });
+      }
+    }
   }
 
   /**
@@ -630,7 +668,7 @@
       </div>
     {:else}
       <div class="file-grid">
-        {#each filteredFiles as file, index}
+        {#each paginatedFiles as file, index}
           <div
             class="file-card {file.type === 'directory' ? 'directory' : ''}"
             style="--delay: {index * 0.05}s"
@@ -667,6 +705,14 @@
           </div>
         {/each}
       </div>
+      
+      <!-- Pagination Component -->
+      <Pagination 
+        totalItems={filteredFiles.length}
+        {itemsPerPage}
+        {currentPage}
+        onPageChange={handlePageChange}
+      />
     {/if}
 
     <footer class="footer">

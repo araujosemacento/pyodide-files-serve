@@ -189,5 +189,17 @@
     "language_distribution": "Distribuição por Idioma",
     "top_files": "Top 10 Arquivos Mais Acessados",
     "footer_text": "Analytics atualizados em tempo real através do Pantry Cloud"
+  },
+  "pagination": {
+    "previous": "Anterior",
+    "next": "Próximo",
+    "page": "Página",
+    "of": "de",
+    "showing": "Exibindo",
+    "to": "até",
+    "results": "resultados",
+    "first": "Primeira",
+    "last": "Última",
+    "goto_page": "Ir para página"
   }
 }
