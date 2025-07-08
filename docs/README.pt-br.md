@@ -9,6 +9,7 @@
 - [Variáveis de Ambiente](./configuration/environment-variables.pt-br.md) | [EN](./configuration/environment-variables.en.md)
   - **Importante**: Usa criptografia dotenvx com arquivos separados `.env` (local) e `.env.ci` (produção)
 - [CORS](./configuration/cors.pt-br.md) | [EN](./configuration/cors.en.md)
+- [Sistema de Analytics](./configuration/analytics.pt-br.md) | [EN](./configuration/analytics.en.md)
 
 ### 🚀 Desenvolvimento
 

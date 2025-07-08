@@ -1,0 +1,75 @@
+name: Code Quality
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint and Format Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Type checking
+        run: bun run check
+
+      - name: Config generation test
+        run: |
+          echo "🔍 Testing config generation..."
+          bun run generate-config
+          if [ -f "static/config.yml" ]; then
+            echo "✅ Config generated successfully"
+            ls -la static/config.yml
+          else
+            echo "❌ Config generation failed"
+            exit 1
+          fi
+
+  docs:
+    name: Documentation Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check documentation structure
+        run: |
+          echo "📚 Checking documentation structure..."
+
+          # Verify main docs exist
+          for doc in "docs/README.md" "docs/README.pt-br.md"; do
+            if [ -f "$doc" ]; then
+              echo "✅ $doc exists"
+            else
+              echo "❌ $doc missing"
+              exit 1
+            fi
+          done
+
+          # Verify analytics docs exist
+          for doc in "docs/configuration/analytics.en.md" "docs/configuration/analytics.pt-br.md"; do
+            if [ -f "$doc" ]; then
+              echo "✅ $doc exists"
+            else
+              echo "❌ $doc missing"
+              exit 1
+            fi
+          done
+
+          echo "✅ All documentation files present"

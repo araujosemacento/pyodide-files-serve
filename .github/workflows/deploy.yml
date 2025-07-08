@@ -1,4 +1,4 @@
-name: Deploy SvelteKit to GitHub Pages
+name: Deploy to GitHub Pages
 
 on:
   push:
@@ -15,8 +15,8 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # Build job
-  build:
+  build-and-deploy:
+    name: Build and Deploy
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -39,7 +39,7 @@ jobs:
       - name: Install dotenvx
         run: curl -sfS https://dotenvx.sh/install.sh | sh
 
-      - name: Build
+      - name: Build application
         run: bun dotenvx run -- bun run build
         env:
           DOTENV_PRIVATE_KEY_CI: ${{ secrets.DOTENV_PRIVATE_KEY_CI }}
@@ -49,14 +49,6 @@ jobs:
         with:
           path: ./build
 
-  # Deploy job
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

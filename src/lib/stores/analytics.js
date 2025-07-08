@@ -50,6 +50,16 @@ class AnalyticsService {
     this.localStorageKey = `analytics_${this.basket}`;
     this.lastReconnectAttempt = 0;
     this.reconnectInterval = 5 * 60 * 1000; // 5 minutos
+
+    // Cache local para evitar múltiplas requisições
+    this.cachedData = null;
+    this.cacheTimestamp = 0;
+    this.cacheTimeout = 30000; // 30 segundos
+    this.isInitialized = false;
+
+    // Debounce para atualizações
+    this.updateTimeout = null;
+    this.pendingUpdates = {};
   }
 
   getCurrentBasket() {
@@ -118,6 +128,10 @@ class AnalyticsService {
         logger.log('Reconexão bem-sucedida! Voltando para API remota.');
         this.useLocalStorage = false;
         this.isDisabled = false;
+
+        // Sincroniza dados locais com remotos após reconexão
+        await this.syncAfterReconnect();
+
         return true;
       }
     } catch (error) {
@@ -125,6 +139,81 @@ class AnalyticsService {
     }
 
     return false;
+  }
+
+  /**
+   * Sincroniza dados após reconexão bem-sucedida
+   */
+  async syncAfterReconnect() {
+    if (!this.cachedData) return;
+
+    try {
+      logger.log('Sincronizando dados locais após reconexão...');
+
+      // Carrega dados remotos atuais
+      const remoteData = await this.getAnalytics();
+
+      if (remoteData) {
+        // Faz merge dos dados locais com remotos
+        const mergedData = this.mergeAnalyticsData(remoteData, this.cachedData);
+
+        // Atualiza tanto cache quanto API
+        this.cachedData = mergedData;
+        await this.updateAnalytics(mergedData);
+
+        // Atualiza store
+        const processedData = this.processAnalytics(mergedData);
+        // @ts-ignore
+        analyticsData.set(processedData);
+
+        logger.log('Sincronização pós-reconexão bem-sucedida');
+      } else {
+        // Se não há dados remotos, envia os locais
+        await this.updateAnalytics(this.cachedData);
+        logger.log('Dados locais enviados para API remota');
+      }
+    } catch (error) {
+      logger.error('Erro na sincronização pós-reconexão:', error);
+    }
+  }
+
+  /**
+   * Faz merge de dados locais e remotos
+   * @param {any} remoteData
+   * @param {any} localData
+   */
+  mergeAnalyticsData(remoteData, localData) {
+    const merged = { ...remoteData };
+
+    // Soma valores numéricos
+    const numericFields = ['pageViews', 'searchUsage', 'filterUsage', 'commonjsCopyClicks', 'esmCopyClicks'];
+    numericFields.forEach(field => {
+      merged[field] = (remoteData[field] || 0) + (localData[field] || 0);
+    });
+
+    // Merge de arrays únicos (IPs)
+    merged.uniqueIPs = [...new Set([...(remoteData.uniqueIPs || []), ...(localData.uniqueIPs || [])])];
+
+    // Merge de sessões
+    merged.sessions = [...(remoteData.sessions || []), ...(localData.sessions || [])];
+    if (merged.sessions.length > ANALYTICS_CONFIG.MAX_SESSIONS_STORED) {
+      merged.sessions = merged.sessions.slice(-ANALYTICS_CONFIG.MAX_SESSIONS_STORED);
+    }
+
+    // Merge de language views
+    merged.languageViews = {
+      'pt-BR': (remoteData.languageViews?.['pt-BR'] || 0) + (localData.languageViews?.['pt-BR'] || 0),
+      'en-US': (remoteData.languageViews?.['en-US'] || 0) + (localData.languageViews?.['en-US'] || 0)
+    };
+
+    // Merge de file access
+    merged.fileAccess = { ...(remoteData.fileAccess || {}) };
+    const localFileAccess = localData.fileAccess || {};
+    Object.keys(localFileAccess).forEach(file => {
+      merged.fileAccess[file] = (merged.fileAccess[file] || 0) + localFileAccess[file];
+    });
+
+    return merged;
   }
 
   /**
@@ -348,34 +437,27 @@ class AnalyticsService {
     return await this.queueRequest('PUT', data);
   }
 
+  /**
+   * Verifica se cache é válido
+   */
+  isCacheValid() {
+    const now = Date.now();
+    return this.cachedData && (now - this.cacheTimestamp) < this.cacheTimeout;
+  }
+
+  /**
+   * Carrega dados com cache para evitar múltiplas requisições
+   */
   async getCurrentAnalytics() {
     logger.log('Carregando analytics atual...');
 
-    // Primeiro tenta carregar dados existentes
-    let data = await this.getAnalytics();
-
-    if (!data) {
-      logger.log('Basket não existe, criando novo com POST...');
-      const defaultData = this.getDefaultAnalytics();
-
-      // Cria o basket com POST
-      const createResult = await this.createBasket(defaultData);
-
-      if (createResult && createResult.success) {
-        logger.log('Basket criado com sucesso, carregando dados...');
-        // Após criar, carrega os dados com GET
-        data = await this.getAnalytics();
-        if (!data) {
-          logger.log('Erro ao carregar dados após criação, usando padrão');
-          data = defaultData;
-        }
-      } else {
-        logger.log('Falha ao criar basket, usando dados padrão');
-        data = defaultData;
-      }
+    // Se ainda não foi inicializado ou cache é inválido, carrega dados frescos
+    if (!this.isInitialized || !this.isCacheValid()) {
+      await this.loadFreshData();
     }
 
-    const processedData = this.processAnalytics(data);
+    const processedData = this.processAnalytics(this.cachedData || this.getDefaultAnalytics());
+
     // @ts-ignore
     analyticsData.set(processedData);
 
@@ -383,6 +465,48 @@ class AnalyticsService {
     analyticsStatus.set(this.getStatus());
 
     return processedData;
+  }
+
+  /**
+   * Carrega dados frescos da API ou localStorage
+   */
+  async loadFreshData() {
+    try {
+      // Primeiro tenta carregar dados existentes
+      let data = await this.getAnalytics();
+
+      if (!data) {
+        logger.log('Basket não existe, criando novo com POST...');
+        const defaultData = this.getDefaultAnalytics();
+
+        // Cria o basket com POST
+        const createResult = await this.createBasket(defaultData);
+
+        if (createResult && createResult.success) {
+          logger.log('Basket criado com sucesso, carregando dados...');
+          // Após criar, carrega os dados com GET
+          data = await this.getAnalytics();
+          if (!data) {
+            logger.log('Erro ao carregar dados após criação, usando padrão');
+            data = defaultData;
+          }
+        } else {
+          logger.log('Falha ao criar basket, usando dados padrão');
+          data = defaultData;
+        }
+      }
+
+      // Atualiza cache
+      this.cachedData = data;
+      this.cacheTimestamp = Date.now();
+      this.isInitialized = true;
+
+    } catch (error) {
+      logger.error('Erro ao carregar dados frescos:', error);
+      this.cachedData = this.getDefaultAnalytics();
+      this.cacheTimestamp = Date.now();
+      this.isInitialized = true;
+    }
   }
 
   getDefaultAnalytics() {
@@ -457,20 +581,86 @@ class AnalyticsService {
     setInterval(handleSessionEnd, ANALYTICS_CONFIG.SAVE_INTERVAL);
   }
 
+  /**
+   * Atualiza cache local e agenda sincronização
+   * @param {string} key
+   * @param {any} value
+   */
+  updateLocalCache(key, value) {
+    if (!this.cachedData) {
+      this.cachedData = this.getDefaultAnalytics();
+    }
+
+    // Atualiza cache local imediatamente
+    if (key === 'pageViews' || key === 'searchUsage' || key === 'filterUsage' ||
+      key === 'commonjsCopyClicks' || key === 'esmCopyClicks') {
+      this.cachedData[key] = (this.cachedData[key] || 0) + (value || 1);
+    } else if (key === 'languageViews') {
+      this.cachedData.languageViews = this.cachedData.languageViews || {};
+      this.cachedData.languageViews[value] = (this.cachedData.languageViews[value] || 0) + 1;
+    } else if (key === 'uniqueIPs') {
+      this.cachedData.uniqueIPs = this.cachedData.uniqueIPs || [];
+      if (!this.cachedData.uniqueIPs.includes(value)) {
+        this.cachedData.uniqueIPs.push(value);
+      }
+    } else if (key === 'sessions') {
+      this.cachedData.sessions = this.cachedData.sessions || [];
+      this.cachedData.sessions.push(value);
+      if (this.cachedData.sessions.length > ANALYTICS_CONFIG.MAX_SESSIONS_STORED) {
+        this.cachedData.sessions = this.cachedData.sessions.slice(-ANALYTICS_CONFIG.MAX_SESSIONS_STORED);
+      }
+    } else if (key === 'fileAccess') {
+      this.cachedData.fileAccess = this.cachedData.fileAccess || {};
+      this.cachedData.fileAccess[value] = (this.cachedData.fileAccess[value] || 0) + 1;
+    }
+
+    // Atualiza store imediatamente para UI responsiva
+    const processedData = this.processAnalytics(this.cachedData);
+    // @ts-ignore
+    analyticsData.set(processedData);
+
+    // Agenda sincronização com debounce
+    this.scheduleSync();
+  }
+
+  /**
+   * Agenda sincronização com debounce
+   */
+  scheduleSync() {
+    if (this.updateTimeout) {
+      clearTimeout(this.updateTimeout);
+    }
+
+    this.updateTimeout = setTimeout(async () => {
+      await this.syncWithRemote();
+    }, 2000); // 2 segundos de debounce
+  }
+
+  /**
+   * Sincroniza cache local com API remota
+   */
+  async syncWithRemote() {
+    if (!this.cachedData) return;
+
+    try {
+      logger.log('Sincronizando com API remota...');
+      await this.updateAnalytics(this.cachedData);
+      logger.log('Sincronização bem-sucedida');
+    } catch (error) {
+      logger.error('Erro na sincronização:', error);
+    }
+  }
+
   async trackPageView() {
     try {
-      const data = await this.getCurrentAnalytics();
-      data.pageViews = (data.pageViews || 0) + 1;
+      // Atualiza cache local imediatamente
+      this.updateLocalCache('pageViews', 1);
 
       // Incrementa por idioma
       const language = this.getLanguage();
-      data.languageViews = data.languageViews || {};
-      data.languageViews[language] = (data.languageViews[language] || 0) + 1;
+      this.updateLocalCache('languageViews', language);
 
-      // @ts-ignore
-      await this.updateAnalytics(data);
-      // @ts-ignore
-      analyticsData.set(this.processAnalytics(data));
+      logger.log('Page view registrado');
     } catch (error) {
       logger.error('Erro ao trackear page view:', error);
     }
@@ -481,20 +671,10 @@ class AnalyticsService {
       const ipResponse = await fetch('https://api.ipify.org?format=json');
       const { ip } = await ipResponse.json();
 
-      const data = await this.getCurrentAnalytics();
-      // @ts-ignore
-      data.uniqueIPs = data.uniqueIPs || [];
+      // Atualiza cache local imediatamente
+      this.updateLocalCache('uniqueIPs', ip);
 
-      // @ts-ignore
-      if (!data.uniqueIPs.includes(ip)) {
-        // @ts-ignore
-        data.uniqueIPs.push(ip);
-      }
-
-      // @ts-ignore
-      await this.updateAnalytics(data);
-      // @ts-ignore
-      analyticsData.set(this.processAnalytics(data));
+      logger.log('IP único registrado:', ip);
     } catch (error) {
       logger.error('Erro ao trackear IP:', error);
     }
@@ -505,26 +685,16 @@ class AnalyticsService {
    */
   async trackSessionDuration(duration) {
     try {
-      const data = await this.getCurrentAnalytics();
-      // @ts-ignore
-      data.sessions = data.sessions || [];
-      // @ts-ignore
-      data.sessions.push({
+      const sessionData = {
         start: Date.now() - duration,
         duration: duration,
         timestamp: Date.now()
-      });
+      };
 
-      // @ts-ignore
-      if (data.sessions.length > ANALYTICS_CONFIG.MAX_SESSIONS_STORED) {
-        // @ts-ignore
-        data.sessions = data.sessions.slice(-ANALYTICS_CONFIG.MAX_SESSIONS_STORED);
-      }
+      // Atualiza cache local imediatamente
+      this.updateLocalCache('sessions', sessionData);
 
-      // @ts-ignore
-      await this.updateAnalytics(data);
-      // @ts-ignore
-      analyticsData.set(this.processAnalytics(data));
+      logger.log('Duração de sessão registrada:', duration);
     } catch (error) {
       logger.error('Erro ao trackear duração:', error);
     }
@@ -535,35 +705,29 @@ class AnalyticsService {
    */
   async trackEvent(eventType, eventData = {}) {
     try {
-      const data = await this.getCurrentAnalytics();
-
       switch (eventType) {
         case 'search':
-          data.searchUsage = (data.searchUsage || 0) + 1;
+          this.updateLocalCache('searchUsage', 1);
           break;
         case 'filter':
-          data.filterUsage = (data.filterUsage || 0) + 1;
+          this.updateLocalCache('filterUsage', 1);
           break;
         case 'copy_commonjs':
-          data.commonjsCopyClicks = (data.commonjsCopyClicks || 0) + 1;
+          this.updateLocalCache('commonjsCopyClicks', 1);
           break;
         case 'copy_esm':
-          data.esmCopyClicks = (data.esmCopyClicks || 0) + 1;
+          this.updateLocalCache('esmCopyClicks', 1);
           break;
         case 'file_access':
           // @ts-ignore
-          data.fileAccess = data.fileAccess || {};
-          // @ts-ignore
           const fileName = eventData.fileName;
-          // @ts-ignore
-          data.fileAccess[fileName] = (data.fileAccess[fileName] || 0) + 1;
+          if (fileName) {
+            this.updateLocalCache('fileAccess', fileName);
+          }
           break;
       }
 
-      // @ts-ignore
-      await this.updateAnalytics(data);
-      // @ts-ignore
-      analyticsData.set(this.processAnalytics(data));
+      logger.log('Evento registrado:', eventType, eventData);
     } catch (error) {
       logger.error('Erro ao trackear evento:', error);
     }
@@ -618,6 +782,16 @@ class AnalyticsService {
       nextReconnectIn: this.useLocalStorage ?
         Math.max(0, this.reconnectInterval - (Date.now() - this.lastReconnectAttempt)) : 0
     };
+  }
+
+  /**
+   * Limpa recursos e timeouts
+   */
+  cleanup() {
+    if (this.updateTimeout) {
+      clearTimeout(this.updateTimeout);
+      this.updateTimeout = null;
+    }
   }
 }
 

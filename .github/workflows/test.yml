@@ -1,0 +1,45 @@
+name: Analytics Tests
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analytics-test:
+    name: Analytics System Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Generate config
+        run: bun run generate-config
+
+      - name: Setup test environment
+        run: |
+          echo "🧪 Setting up analytics test environment..."
+          echo "TEST_MODE=true" >> $GITHUB_ENV
+
+      - name: Run analytics validation
+        run: |
+          echo "🔍 Running analytics system validation..."
+          bun run test:analytics
+          echo "✅ Analytics validation completed successfully"
+
+      - name: Test report
+        run: |
+          echo "📊 Analytics system validated and ready for deployment"

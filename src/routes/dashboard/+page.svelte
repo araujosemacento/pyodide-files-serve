@@ -19,18 +19,28 @@
     // Carregar dados de analytics no cliente
     loadAnalyticsData();
     
+    // Configurar atualização periódica dos dados
+    const intervalId = setInterval(loadAnalyticsData, 30000); // 30 segundos
+    
     setTimeout(() => {
       isLoading = false;
       animateCharts();
     }, 1000);
+
+    // Cleanup do interval quando componente é destruído
+    return () => {
+      clearInterval(intervalId);
+    };
   });
 
   async function loadAnalyticsData() {
     try {
+      logger.log('Dashboard: Carregando dados de analytics...');
       const data = await analytics.getCurrentAnalytics();
       analyticsData.set(data);
+      logger.log('Dashboard: Dados carregados com sucesso', data);
     } catch (error) {
-      logger.error('Erro ao carregar analytics:', error);
+      logger.error('Dashboard: Erro ao carregar analytics:', error);
       // Usar dados padrão em caso de erro
       analyticsData.set({
         pageViews: 0,
