@@ -7,6 +7,7 @@
 ### 🔧 Configuration
 
 - [Environment Variables](./configuration/environment-variables.pt-br.md) | [EN](./configuration/environment-variables.en.md)
+  - **Important**: Uses dotenvx encryption with separate `.env` (local) and `.env.ci` (production) files
 - [CORS](./configuration/cors.pt-br.md) | [EN](./configuration/cors.en.md)
 
 ### 🚀 Development

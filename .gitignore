@@ -26,9 +26,8 @@ Thumbs.db
 
 # Environment
 !.env.*
+.env
+.env.dev
 .env.local
 .env.development
-.env.production
-.env.dev
-.env.prod
 *.keys

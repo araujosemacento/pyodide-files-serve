@@ -40,9 +40,9 @@ jobs:
         run: curl -sfS https://dotenvx.sh/install.sh | sh
 
       - name: Build
-        run: bun dotenvx run vite build
+        run: bun dotenvx run -- bun run build
         env:
-          PUBLIC_PANTRY_ID: ${{ secrets.DOTENV_PRIVATE_KEY_CI }}
+          DOTENV_PRIVATE_KEY_CI: ${{ secrets.DOTENV_PRIVATE_KEY_CI }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

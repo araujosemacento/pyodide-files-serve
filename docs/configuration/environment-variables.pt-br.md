@@ -6,6 +6,8 @@ Este projeto utiliza variáveis de ambiente para configuração segura de APIs e
 
 ## 🗂️ Arquivos de Configuração
 
+Este projeto utiliza **dotenvx** para criptografia segura de variáveis de ambiente, permitindo que dados sensíveis sejam armazenados de forma segura no repositório.
+
 ### `.env` (Desenvolvimento Local)
 
 Arquivo para configuração local de desenvolvimento (não commitado no Git).
@@ -13,6 +15,35 @@ Arquivo para configuração local de desenvolvimento (não commitado no Git).
 ```dotenv
 # Analytics - Pantry Cloud Configuration
 PUBLIC_PANTRY_ID=seu_pantry_id_aqui
+```
+
+### `.env.ci` (Produção Criptografada)
+
+Arquivo commitado com variáveis criptografadas para produção. Utiliza dotenvx para criptografia segura.
+
+```dotenv
+#/-------------------[DOTENV_PUBLIC_KEY]--------------------/
+#/            public-key encryption for .env files          /
+#/       [how it works](https://dotenvx.com/encryption)     /
+#/----------------------------------------------------------/
+DOTENV_PUBLIC_KEY_CI="chave_publica_dotenvx"
+
+# .env.ci
+PUBLIC_PANTRY_ID='encrypted:valor_criptografado_aqui'
+```
+
+### `.env.keys` (Chaves de Descriptografia)
+
+Arquivo com chaves privadas para descriptografar `.env.ci` (NÃO commitado no Git).
+
+```dotenv
+#/------------------!DOTENV_PRIVATE_KEYS!-------------------/
+#/ private decryption keys. DO NOT commit to source control /
+#/     [how it works](https://dotenvx.com/encryption)       /
+#/----------------------------------------------------------/
+
+# .env.ci
+DOTENV_PRIVATE_KEY_CI=chave_privada_descriptografia
 ```
 
 ### `.env.example` (Template)
@@ -61,13 +92,34 @@ npm run dev
 
 ## 🌐 Configuração para Produção
 
-### GitHub Pages (Recomendado)
+### GitHub Pages com Dotenvx (Recomendado)
 
-O projeto usa dotenvx para criptografia segura das variáveis:
+O projeto usa **dotenvx** para criptografia segura das variáveis, permitindo armazenar dados sensíveis de forma segura no repositório:
 
-1. **Variáveis criptografadas** no arquivo `.env` commitado
-2. **Chave de descriptografia** configurada nos Secrets do GitHub
-3. **Descriptografia automática** durante o build
+#### 1. Criptografia Local
+
+```bash
+# Criptografar variável para produção
+npx dotenvx encrypt -f .env.ci
+```
+
+#### 2. Configuração GitHub Secrets
+
+- **`DOTENV_PRIVATE_KEY_CI`**: Chave privada para descriptografar `.env.ci`
+- Obtida do arquivo `.env.keys` (não commitado)
+
+#### 3. Estrutura de Arquivos
+
+- **`.env.ci`**: Variáveis criptografadas (commitado)
+- **`.env.keys`**: Chaves privadas (NÃO commitado)
+- **`.env`**: Desenvolvimento local (NÃO commitado)
+
+#### ⚠️ Importância dos Ambientes
+
+- **`.env`**: Desenvolvimento local sem criptografia
+- **`.env.ci`**: Produção com valores criptografados via dotenvx
+- **Separação necessária**: Evita conflitos entre desenvolvimento e produção
+- **Segurança**: Dados sensíveis ficam criptografados no repositório público
 
 ### Configuração Manual
 
@@ -89,7 +141,9 @@ Para outras plataformas de deploy:
 - ✅ Nunca commite arquivos `.env` com dados reais
 - ✅ Use `.env.example` como template
 - ✅ Configure Secrets no GitHub para variáveis sensíveis
-- ✅ Use criptografia para variáveis em repositórios públicos
+- ✅ Use criptografia dotenvx para variáveis em repositórios públicos
+- ✅ Mantenha `.env` para desenvolvimento e `.env.ci` para produção
+- ✅ Nunca commite `.env.keys` no repositório
 
 ## 🛠️ Troubleshooting
 
@@ -117,4 +171,5 @@ Se o analytics não funcionar:
 
 - [SvelteKit Environment Variables](https://kit.svelte.dev/docs/modules#$env-dynamic-public)
 - [Dotenvx Documentation](https://dotenvx.com/)
+- [Dotenvx Encryption Guide](https://dotenvx.com/docs/quickstart#add-encryption)
 - [Pantry Cloud API](https://getpantry.cloud/)

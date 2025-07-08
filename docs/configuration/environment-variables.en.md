@@ -6,6 +6,8 @@ This project uses environment variables for secure configuration of external API
 
 ## 🗂️ Configuration Files
 
+This project uses **dotenvx** for secure encryption of environment variables, allowing sensitive data to be stored safely in the repository.
+
 ### `.env` (Local Development)
 
 File for local development configuration (not committed to Git).
@@ -13,6 +15,35 @@ File for local development configuration (not committed to Git).
 ```dotenv
 # Analytics - Pantry Cloud Configuration
 PUBLIC_PANTRY_ID=your_pantry_id_here
+```
+
+### `.env.ci` (Encrypted Production)
+
+Committed file with encrypted variables for production. Uses dotenvx for secure encryption.
+
+```dotenv
+#/-------------------[DOTENV_PUBLIC_KEY]--------------------/
+#/            public-key encryption for .env files          /
+#/       [how it works](https://dotenvx.com/encryption)     /
+#/----------------------------------------------------------/
+DOTENV_PUBLIC_KEY_CI="dotenvx_public_key"
+
+# .env.ci
+PUBLIC_PANTRY_ID='encrypted:encrypted_value_here'
+```
+
+### `.env.keys` (Decryption Keys)
+
+File with private keys to decrypt `.env.ci` (NOT committed to Git).
+
+```dotenv
+#/------------------!DOTENV_PRIVATE_KEYS!-------------------/
+#/ private decryption keys. DO NOT commit to source control /
+#/     [how it works](https://dotenvx.com/encryption)       /
+#/----------------------------------------------------------/
+
+# .env.ci
+DOTENV_PRIVATE_KEY_CI=private_decryption_key
 ```
 
 ### `.env.example` (Template)
@@ -61,13 +92,34 @@ npm run dev
 
 ## 🌐 Production Configuration
 
-### GitHub Pages (Recommended)
+### GitHub Pages with Dotenvx (Recommended)
 
-The project uses dotenvx for secure variable encryption:
+The project uses **dotenvx** for secure variable encryption, allowing safe storage of sensitive data in the repository:
 
-1. **Encrypted variables** in the committed `.env` file
-2. **Decryption key** configured in GitHub Secrets
-3. **Automatic decryption** during build
+#### 1. Local Encryption
+
+```bash
+# Encrypt variable for production
+npx dotenvx encrypt -f .env.ci
+```
+
+#### 2. GitHub Secrets Configuration
+
+- **`DOTENV_PRIVATE_KEY_CI`**: Private key to decrypt `.env.ci`
+- Obtained from `.env.keys` file (not committed)
+
+#### 3. File Structure
+
+- **`.env.ci`**: Encrypted variables (committed)
+- **`.env.keys`**: Private keys (NOT committed)
+- **`.env`**: Local development (NOT committed)
+
+#### ⚠️ Environment Importance
+
+- **`.env`**: Local development without encryption
+- **`.env.ci`**: Production with encrypted values via dotenvx
+- **Separation required**: Avoids conflicts between development and production
+- **Security**: Sensitive data is encrypted in the public repository
 
 ### Manual Configuration
 
@@ -89,7 +141,9 @@ For other deployment platforms:
 - ✅ Never commit `.env` files with real data
 - ✅ Use `.env.example` as template
 - ✅ Configure Secrets in GitHub for sensitive variables
-- ✅ Use encryption for variables in public repositories
+- ✅ Use dotenvx encryption for variables in public repositories
+- ✅ Keep `.env` for development and `.env.ci` for production
+- ✅ Never commit `.env.keys` to the repository
 
 ## 🛠️ Troubleshooting
 
@@ -117,4 +171,5 @@ If analytics doesn't work:
 
 - [SvelteKit Environment Variables](https://kit.svelte.dev/docs/modules#$env-dynamic-public)
 - [Dotenvx Documentation](https://dotenvx.com/)
+- [Dotenvx Encryption Guide](https://dotenvx.com/docs/quickstart#add-encryption)
 - [Pantry Cloud API](https://getpantry.cloud/)
