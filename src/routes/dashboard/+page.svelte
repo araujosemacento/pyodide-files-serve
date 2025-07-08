@@ -48,10 +48,12 @@
         averageSessionDuration: 0,
         searchUsage: 0,
         filterUsage: 0,
+        categoryFilterUsage: {},
         commonjsCopyClicks: 0,
         esmCopyClicks: 0,
         languageViews: { 'pt-BR': 0, 'en-US': 0 },
-        topFiles: []
+        topFiles: [],
+        topCategories: []
       });
     }
   }
@@ -320,6 +322,37 @@
                   bind:this={progressBars[`file-${index}`]}
                   data-width={(file.count / maxFileAccess) * 100}
                   style="background-color: {getProgressColor(index)}"
+                ></div>
+              </div>
+            </div>
+          {/each}
+        </div>
+      </div>
+    {/if}
+
+    <!-- Top Categories Section -->
+    {#if stats.topCategories && stats.topCategories.length > 0}
+      <div class="top-categories-section" transition:fly={{ y: 30, delay: 750 }}>
+        <h3>📂 {$_("dashboard.top_categories", { default: "Categorias Mais Filtradas" })}</h3>
+        <div class="top-categories-grid">
+          {#each stats.topCategories as category, index}
+            <div 
+              class="category-rank-card" 
+              transition:fly={{ x: 20, delay: 850 + (index * 50) }}
+            >
+              <div class="rank-number">#{index + 1}</div>
+              <div class="category-info">
+                <div class="category-name" title={category.categoryName}>
+                  {$_(`categories.${category.categoryName}`, { default: category.categoryName })}
+                </div>
+                <div class="filter-count">{category.count} filtros aplicados</div>
+              </div>
+              <div class="category-progress">
+                <div 
+                  class="category-progress-bar" 
+                  bind:this={progressBars[`category-${index}`]}
+                  data-width={(category.count / Math.max(...stats.topCategories.map(c => c.count))) * 100}
+                  style="background-color: {getProgressColor(index + 10)}"
                 ></div>
               </div>
             </div>
@@ -702,17 +735,23 @@
     margin-bottom: 3rem;
   }
 
-  .top-files-section h3 {
+  .top-files-section h3,
+  .top-categories-section h3 {
     margin-bottom: 2rem;
     color: var(--color-text);
     font-size: 1.5rem;
     text-align: center;
   }
 
-  .top-files-grid {
+  .top-files-grid,
+  .top-categories-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 1rem;
+  }
+
+  .top-categories-section {
+    margin-bottom: 3rem;
   }
 
   .file-rank-card {
@@ -726,9 +765,21 @@
     transition: all var(--transition-normal);
   }
 
-  .file-rank-card:hover {
+  .file-rank-card:hover,
+  .category-rank-card:hover {
     transform: translateX(4px);
     border-color: var(--color-theme-1);
+  }
+
+  .category-rank-card {
+    background: var(--color-bg-2);
+    border-radius: var(--border-radius-md);
+    padding: 1.5rem;
+    border: 2px solid var(--color-bg-3);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all var(--transition-normal);
   }
 
   .rank-number {
@@ -748,7 +799,12 @@
     flex: 1;
   }
 
-  .file-name {
+  .category-info {
+    flex: 1;
+  }
+
+  .file-name,
+  .category-name {
     font-weight: 600;
     color: var(--color-text);
     white-space: nowrap;
@@ -757,12 +813,14 @@
     margin-bottom: 0.25rem;
   }
 
-  .access-count {
+  .access-count,
+  .filter-count {
     color: var(--color-text-muted);
     font-size: 0.9rem;
   }
 
-  .file-progress {
+  .file-progress,
+  .category-progress {
     width: 60px;
     height: 4px;
     background: var(--color-bg-3);
@@ -770,7 +828,8 @@
     overflow: hidden;
   }
 
-  .file-progress-bar {
+  .file-progress-bar,
+  .category-progress-bar {
     height: 100%;
     border-radius: 2px;
     width: 0%;
@@ -803,6 +862,10 @@
     }
 
     .top-files-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .top-categories-grid {
       grid-template-columns: 1fr;
     }
 

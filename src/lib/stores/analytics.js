@@ -10,13 +10,15 @@ export const analyticsData = writable({
   averageSessionDuration: 0,
   searchUsage: 0,
   filterUsage: 0,
+  categoryFilterUsage: {},
   commonjsCopyClicks: 0,
   esmCopyClicks: 0,
   languageViews: {
     'pt-BR': 0,
     'en-US': 0
   },
-  topFiles: []
+  topFiles: [],
+  topCategories: []
 });
 
 // Store para controle de sessão
@@ -211,6 +213,13 @@ class AnalyticsService {
     const localFileAccess = localData.fileAccess || {};
     Object.keys(localFileAccess).forEach(file => {
       merged.fileAccess[file] = (merged.fileAccess[file] || 0) + localFileAccess[file];
+    });
+
+    // Merge de category filter usage
+    merged.categoryFilterUsage = { ...(remoteData.categoryFilterUsage || {}) };
+    const localCategoryFilterUsage = localData.categoryFilterUsage || {};
+    Object.keys(localCategoryFilterUsage).forEach(category => {
+      merged.categoryFilterUsage[category] = (merged.categoryFilterUsage[category] || 0) + localCategoryFilterUsage[category];
     });
 
     return merged;
@@ -516,6 +525,7 @@ class AnalyticsService {
       sessions: [],
       searchUsage: 0,
       filterUsage: 0,
+      categoryFilterUsage: {},
       commonjsCopyClicks: 0,
       esmCopyClicks: 0,
       languageViews: {
@@ -595,6 +605,9 @@ class AnalyticsService {
     if (key === 'pageViews' || key === 'searchUsage' || key === 'filterUsage' ||
       key === 'commonjsCopyClicks' || key === 'esmCopyClicks') {
       this.cachedData[key] = (this.cachedData[key] || 0) + (value || 1);
+    } else if (key === 'categoryFilterUsage') {
+      this.cachedData.categoryFilterUsage = this.cachedData.categoryFilterUsage || {};
+      this.cachedData.categoryFilterUsage[value] = (this.cachedData.categoryFilterUsage[value] || 0) + 1;
     } else if (key === 'languageViews') {
       this.cachedData.languageViews = this.cachedData.languageViews || {};
       this.cachedData.languageViews[value] = (this.cachedData.languageViews[value] || 0) + 1;
@@ -712,6 +725,13 @@ class AnalyticsService {
         case 'filter':
           this.updateLocalCache('filterUsage', 1);
           break;
+        case 'category_filter':
+          // @ts-ignore
+          const categoryName = eventData.category;
+          if (categoryName && categoryName !== 'all') {
+            this.updateLocalCache('categoryFilterUsage', categoryName);
+          }
+          break;
         case 'copy_commonjs':
           this.updateLocalCache('commonjsCopyClicks', 1);
           break;
@@ -734,7 +754,7 @@ class AnalyticsService {
   }
 
   /**
-   * @param {{ pageViews: any; uniqueIPs: any; averageSessionDuration?: number; searchUsage: any; filterUsage: any; commonjsCopyClicks: any; esmCopyClicks: any; languageViews: any; topFiles?: { fileName: string; count: any; }[]; sessions?: any; fileAccess?: any; }} rawData
+   * @param {{ pageViews: any; uniqueIPs: any; averageSessionDuration?: number; searchUsage: any; filterUsage: any; categoryFilterUsage?: any; commonjsCopyClicks: any; esmCopyClicks: any; languageViews: any; topFiles?: { fileName: string; count: any; }[]; topCategories?: { categoryName: string; count: any; }[]; sessions?: any; fileAccess?: any; }} rawData
    */
   processAnalytics(rawData) {
     // Calcula duração média das sessões
@@ -750,16 +770,25 @@ class AnalyticsService {
       .slice(0, 10)
       .map(([fileName, count]) => ({ fileName, count }));
 
+    // Processa top 5 categorias mais filtradas
+    const categoryFilterUsage = rawData.categoryFilterUsage || {};
+    const topCategories = Object.entries(categoryFilterUsage)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 5)
+      .map(([categoryName, count]) => ({ categoryName, count }));
+
     return {
       pageViews: rawData.pageViews || 0,
       uniqueIPs: Array.isArray(rawData.uniqueIPs) ? rawData.uniqueIPs.length : 0,
       averageSessionDuration,
       searchUsage: rawData.searchUsage || 0,
       filterUsage: rawData.filterUsage || 0,
+      categoryFilterUsage: rawData.categoryFilterUsage || {},
       commonjsCopyClicks: rawData.commonjsCopyClicks || 0,
       esmCopyClicks: rawData.esmCopyClicks || 0,
       languageViews: rawData.languageViews || { 'pt-BR': 0, 'en-US': 0 },
-      topFiles
+      topFiles,
+      topCategories
     };
   }
 

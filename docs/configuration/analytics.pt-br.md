@@ -12,6 +12,7 @@ Interface web que exibe métricas em tempo real:
 
 - **Visualizações de página** e **IPs únicos**
 - **Uso de pesquisa e filtros**
+- **Categorias mais filtradas** (novo!)
 - **Cliques em código** (CommonJS/ESM)
 - **Visualizações por idioma**
 - **Arquivos mais acessados**
@@ -54,6 +55,7 @@ Interface web que exibe métricas em tempo real:
   sessions: Array,          // Sessões de usuário
   searchUsage: Number,      // Uso da pesquisa
   filterUsage: Number,      // Uso de filtros
+  categoryFilterUsage: Object, // Categorias mais filtradas (novo!)
   commonjsCopyClicks: Number, // Cliques em código CommonJS
   esmCopyClicks: Number,    // Cliques em código ESM
   languageViews: Object,    // Visualizações por idioma
@@ -68,7 +70,7 @@ Interface web que exibe métricas em tempo real:
 No console do navegador (apenas em desenvolvimento):
 
 ```javascript
-window.analyticsTest.simulateEvents() // Simula eventos
+window.analyticsTest.simulateEvents() // Simula eventos (inclui categorias)
 window.analyticsTest.checkStatus()    // Verifica status
 window.analyticsTest.forcSync()       // Força sincronização
 window.analyticsTest.clearTestData()  // Limpa dados de teste

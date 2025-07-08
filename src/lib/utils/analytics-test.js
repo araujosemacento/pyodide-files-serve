@@ -26,6 +26,13 @@ export class AnalyticsTestUtil {
         await new Promise(resolve => setTimeout(resolve, 100));
       }
 
+      // Simula filtros por categoria
+      const categories = ['Computação Científica', 'Análise de Dados', 'Machine Learning', 'Visualização'];
+      for (const category of categories) {
+        await analytics.trackEvent('category_filter', { category });
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+
       // Simula cópias de código
       await analytics.trackEvent('copy_commonjs');
       await analytics.trackEvent('copy_esm');

@@ -118,9 +118,10 @@
     // Filtrar por categoria
     if (selectedCategory !== "all") {
       filtered = filtered.filter((file) => file.category === selectedCategory);
-      // Track filter usage
+      // Track filter usage with category
       if (browser) {
         analytics.trackEvent('filter');
+        analytics.trackEvent('category_filter', { category: selectedCategory });
       }
     }
 

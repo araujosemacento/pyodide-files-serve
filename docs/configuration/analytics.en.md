@@ -12,6 +12,7 @@ Web interface that displays real-time metrics:
 
 - **Page views** and **unique IPs**
 - **Search and filter usage**
+- **Most filtered categories** (new!)
 - **Code clicks** (CommonJS/ESM)
 - **Views by language**
 - **Most accessed files**
@@ -54,6 +55,7 @@ Web interface that displays real-time metrics:
   sessions: Array,          // User sessions
   searchUsage: Number,      // Search usage
   filterUsage: Number,      // Filter usage
+  categoryFilterUsage: Object, // Most filtered categories (new!)
   commonjsCopyClicks: Number, // CommonJS code clicks
   esmCopyClicks: Number,    // ESM code clicks
   languageViews: Object,    // Views by language
@@ -68,7 +70,7 @@ Web interface that displays real-time metrics:
 In browser console (development only):
 
 ```javascript
-window.analyticsTest.simulateEvents() // Simulate events
+window.analyticsTest.simulateEvents() // Simulate events (includes categories)
 window.analyticsTest.checkStatus()    // Check status
 window.analyticsTest.forcSync()       // Force synchronization
 window.analyticsTest.clearTestData()  // Clear test data
