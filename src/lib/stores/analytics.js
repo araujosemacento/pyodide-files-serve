@@ -228,9 +228,16 @@ class AnalyticsService {
         const errorText = await response.text();
 
         // Tratamento específico para diferentes tipos de erro
-        if (response.status === 400 && method === 'GET') {
-          logger.log('Basket não existe ainda (normal em primeira execução)');
-          return null;
+        if (response.status === 400) {
+          if (method === 'GET') {
+            logger.log('Basket não existe ainda (normal em primeira execução)');
+            return null;
+          } else {
+            // Erro 400 em POST/PUT pode indicar problema no Pantry ID ou dados inválidos
+            logger.warn(`Erro 400 em ${method}: Possível problema no Pantry ID ou dados inválidos. Mudando para localStorage.`);
+            this.switchToLocalStorage();
+            return this.handleLocalStorageRequest(method, data);
+          }
         }
 
         if (response.status === 429) {
@@ -245,8 +252,10 @@ class AnalyticsService {
           return this.handleLocalStorageRequest(method, data);
         }
 
-        logger.error(`Erro na requisição: ${response.status} - ${errorText}`);
-        throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+        // Para outros erros HTTP (401, 403, 500, etc.), usar localStorage
+        logger.warn(`Erro HTTP ${response.status}: ${errorText}. Mudando para localStorage.`);
+        this.switchToLocalStorage();
+        return this.handleLocalStorageRequest(method, data);
       }
 
       // POST retorna texto simples, outros métodos retornam JSON
