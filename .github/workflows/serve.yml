@@ -36,10 +36,13 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
+      - name: Install dotenvx
+        run: curl -sfS https://dotenvx.sh/install.sh | sh
+
       - name: Build
+        run: bun dotenvx run vite build
         env:
-          PUBLIC_PANTRY_ID: ${{ secrets.PUBLIC_PANTRY_ID }}
-        run: bun run build
+          PUBLIC_PANTRY_ID: ${{ secrets.DOTENV_PRIVATE_KEY_CI }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

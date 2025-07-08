@@ -3,7 +3,7 @@ import { env } from '$env/dynamic/public';
 // Configuração para analytics
 export const ANALYTICS_CONFIG = {
   // Pantry ID obtido do arquivo .env
-  PANTRY_ID: env.PUBLIC_PANTRY_ID,
+  PANTRY_ID: process.env.PANTRY_ID,
 
   // Nomes das baskets para diferentes ambientes (específicos para este repositório)
   DEV_BASKET: 'pyodide-files-serve-analytics-dev',

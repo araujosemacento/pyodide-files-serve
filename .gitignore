@@ -25,6 +25,10 @@ Thumbs.db
 *.temp
 
 # Environment
-.env
+!.env.*
 .env.local
+.env.development
 .env.production
+.env.dev
+.env.prod
+*.keys
