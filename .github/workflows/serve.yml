@@ -37,6 +37,8 @@ jobs:
         uses: actions/configure-pages@v4
 
       - name: Build
+        env:
+          PUBLIC_PANTRY_ID: ${{ secrets.PUBLIC_PANTRY_ID }}
         run: bun run build
 
       - name: Upload artifact
