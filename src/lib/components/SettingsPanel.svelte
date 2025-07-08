@@ -64,13 +64,13 @@
       <span class="flag">{currentLanguage.flag}</span>
       <span class="theme-indicator">
         {#if $theme === "dark"}
-          🌙
+          ☾
         {:else}
-          ☀️
+          ☀
         {/if}
       </span>
     </span>
-    <span class="chevron" class:rotated={isOpen}>⮟</span>
+    <span class="chevron" class:rotated={isOpen}>✢</span>
   </button>
 
   <div class="dropdown" class:open={isOpen}>

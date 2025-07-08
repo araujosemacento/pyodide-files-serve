@@ -1,5 +1,6 @@
 import yaml from 'js-yaml';
 import { base } from '$app/paths';
+import { logger } from '$lib/utils/logger.js';
 
 // @ts-ignore
 export async function load({ fetch, url }) {
@@ -7,13 +8,13 @@ export async function load({ fetch, url }) {
     // Construir URL baseado no ambiente
     const configUrl = base ? `${base}/config.yml` : '/config.yml';
 
-    console.log('Tentando carregar config de:', configUrl);
+    logger.log('Tentando carregar config de:', configUrl);
 
     // Carrega configuração do arquivo YAML
     const response = await fetch(configUrl);
 
     if (!response.ok) {
-      console.warn(`Config não encontrado em ${configUrl}, tentando path absoluto`);
+      logger.warn(`Config não encontrado em ${configUrl}, tentando path absoluto`);
       // Tentar path absoluto se o relativo falhar
       const absoluteUrl = url.origin + (base || '') + '/config.yml';
       const fallbackResponse = await fetch(absoluteUrl);
@@ -49,7 +50,7 @@ export async function load({ fetch, url }) {
       files: config.files || []
     };
   } catch (error) {
-    console.error('Erro ao carregar configuração:', error);
+    logger.error('Erro ao carregar configuração:', error);
 
     // Fallback com dados estáticos para o backup Pyodide
     return {

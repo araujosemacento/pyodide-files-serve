@@ -11,4 +11,4 @@ init({
   initialLocale: getLocaleFromNavigator(),
 });
 
-export { _, locale, locales } from 'svelte-i18n';
+export { _, locale, locales, json } from 'svelte-i18n';

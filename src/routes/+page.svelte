@@ -8,11 +8,14 @@
   // @ts-ignore
   import { currentPath, files, config } from "$lib/stores.js";
   import { theme } from "$lib/stores/theme.js";
-  import { _, locale } from "$lib/i18n/index.js";
+  import { _, locale, json } from "$lib/i18n/index.js";
   import SettingsPanel from "$lib/components/SettingsPanel.svelte";
+  import DevToolsPanel from "$lib/components/DevToolsPanel.svelte";
   import { base } from "$app/paths";
   import { browser } from "$app/environment";
   import { createUrl, createAbsoluteUrl } from "$lib/routing.js";
+  import { analytics, sessionStore } from "$lib/stores/analytics.js";
+  import { logger } from "$lib/utils/logger.js";
 
   // @ts-ignore
   export let data;
@@ -47,6 +50,11 @@
       }
     }
 
+    // Inicializar sistema de analytics
+    if (browser) {
+      analytics.initializeSession();
+    }
+
     // Simular carregamento inicial realista
     const loadingSteps = [
       { delay: 300, message: "Inicializando..." },
@@ -58,7 +66,7 @@
     let currentStep = 0;
     const loadingInterval = setInterval(() => {
       if (currentStep < loadingSteps.length) {
-        console.log(loadingSteps[currentStep].message);
+        logger.log(loadingSteps[currentStep].message);
         currentStep++;
       } else {
         clearInterval(loadingInterval);
@@ -98,10 +106,18 @@
     // Filtrar por categoria
     if (selectedCategory !== "all") {
       filtered = filtered.filter((file) => file.category === selectedCategory);
+      // Track filter usage
+      if (browser) {
+        analytics.trackEvent('filter');
+      }
     }
 
     // Filtrar por termo de busca
     if (searchTerm.trim()) {
+      // Track search usage
+      if (browser) {
+        analytics.trackEvent('search');
+      }
       filtered = searchFiles(filtered, searchTerm);
     }
 
@@ -109,13 +125,17 @@
   }
 
   /**
-   * @param {{ type: string; path: string; }} file
+   * @param {{ type: string; path: string; name: string; }} file
    */
   function handleFileClick(file) {
     if (file.type === "directory") {
       // Navegar para diretório (implementar lógica de navegação)
-      console.log("Navegando para:", file.path);
+      logger.log("Navegando para:", file.path);
     } else {
+      // Track file access
+      if (browser) {
+        analytics.trackEvent('file_access', { fileName: file.name });
+      }
       // Abrir arquivo usando a URL robusta
       window.open(createUrl(file.path), "_blank");
     }
@@ -171,7 +191,7 @@
     if (navigator.clipboard) {
       navigator.clipboard.writeText(url).then(() => {
         // Feedback visual - você pode personalizar
-        console.log("URL copiada:", url);
+        logger.log("URL copiada:", url);
       });
     } else {
       // Fallback para navegadores mais antigos
@@ -193,6 +213,15 @@
     if (button) {
       const url = button.getAttribute("data-url");
       copyToClipboard(url);
+
+      // Track copy events based on URL
+      if (browser) {
+        if (url.includes('pyodide.js')) {
+          analytics.trackEvent('copy_commonjs');
+        } else if (url.includes('pyodide.mjs')) {
+          analytics.trackEvent('copy_esm');
+        }
+      }
 
       // Feedback visual
       const originalText = button.innerHTML;
@@ -286,6 +315,7 @@
     <nav class="breadcrumb">
       <a href={createUrl("/")}>🏠 {$_("home")}</a> /
       <span>{$_("backup_pyodide")}</span>
+      <a href={createUrl("/dashboard")} class="dashboard-link">📊</a>
     </nav>
 
     <!-- Aviso importante sobre backup -->
@@ -363,7 +393,7 @@
           <div class="compatibility-info">
             <h6>{$_("main_files.commonjs.compatibility")}</h6>
             <ul>
-              {#each $_("main_files.commonjs.compatibility_items") as item}
+              {#each $json("main_files.commonjs.compatibility_items") as item}
                 <li>{item}</li>
               {/each}
             </ul>
@@ -430,7 +460,7 @@
           <div class="compatibility-info">
             <h6>{$_("main_files.esmodule.compatibility")}</h6>
             <ul>
-              {#each $_("main_files.esmodule.compatibility_items") as item}
+              {#each $json("main_files.esmodule.compatibility_items") as item}
                 <li>{item}</li>
               {/each}
             </ul>
@@ -444,7 +474,7 @@
           <div class="benefits-info">
             <h6>{$_("main_files.esmodule.benefits")}</h6>
             <ul>
-              {#each $_("main_files.esmodule.benefits_items") as item}
+              {#each $json("main_files.esmodule.benefits_items") as item}
                 <li>{item}</li>
               {/each}
             </ul>
@@ -503,7 +533,7 @@
             <div class="pros">
               <strong>{$_("info_cards.commonjs.advantages")}</strong>
               <ul>
-                {#each $_("info_cards.commonjs.advantages_items") as item}
+                {#each $json("info_cards.commonjs.advantages_items") as item}
                   <li>{item}</li>
                 {/each}
               </ul>
@@ -511,7 +541,7 @@
             <div class="cons">
               <strong>{$_("info_cards.commonjs.limitations")}</strong>
               <ul>
-                {#each $_("info_cards.commonjs.limitations_items") as item}
+                {#each $json("info_cards.commonjs.limitations_items") as item}
                   <li>{item}</li>
                 {/each}
               </ul>
@@ -529,7 +559,7 @@
             <div class="pros">
               <strong>{$_("info_cards.esmodule.advantages")}</strong>
               <ul>
-                {#each $_("info_cards.esmodule.advantages_items") as item}
+                {#each $json("info_cards.esmodule.advantages_items") as item}
                   <li>{item}</li>
                 {/each}
               </ul>
@@ -537,7 +567,7 @@
             <div class="cons">
               <strong>{$_("info_cards.esmodule.requirements")}</strong>
               <ul>
-                {#each $_("info_cards.esmodule.requirements_items") as item}
+                {#each $json("info_cards.esmodule.requirements_items") as item}
                   <li>{item}</li>
                 {/each}
               </ul>
@@ -552,7 +582,7 @@
             <div class="decision-option">
               <strong>{$_("info_cards.decision.commonjs_when")}</strong>
               <ul>
-                {#each $_("info_cards.decision.commonjs_scenarios") as scenario}
+                {#each $json("info_cards.decision.commonjs_scenarios") as scenario}
                   <li>{scenario}</li>
                 {/each}
               </ul>
@@ -560,7 +590,7 @@
             <div class="decision-option">
               <strong>{$_("info_cards.decision.esmodule_when")}</strong>
               <ul>
-                {#each $_("info_cards.decision.esmodule_scenarios") as scenario}
+                {#each $json("info_cards.decision.esmodule_scenarios") as scenario}
                   <li>{scenario}</li>
                 {/each}
               </ul>
@@ -821,6 +851,29 @@
     margin-bottom: 2rem;
   }
 
+  /* Dashboard link - discreto e simples */
+  .dashboard-link {
+    color: var(--color-text-muted);
+    text-decoration: none;
+    margin-left: 1rem;
+    opacity: 0.6;
+    transition: all var(--transition-normal);
+    font-size: 0.9rem;
+  }
+
+  .dashboard-link:hover {
+    opacity: 1;
+    color: var(--color-theme-1);
+    transform: scale(1.1);
+  }
+
+  @media (max-width: 768px) {
+    .dashboard-link {
+      margin-left: 0.5rem;
+      font-size: 0.8rem;
+    }
+  }
+
   @media (max-width: 768px) {
     .controls {
       flex-direction: column;
@@ -885,27 +938,43 @@
   .demo-card::before {
     content: "";
     position: absolute;
+    pointer-events: none;
+    border-radius: 50%;
+    height: 100%;
     top: -50%;
     left: -50%;
-    width: 200%;
-    height: 200%;
     background: radial-gradient(
       circle,
-      rgba(255, 255, 255, 0.08) 0%,
+      rgba(255, 255, 255, 0.1) 0%,
       /* Efeito mais sutil */ transparent 50%
     );
-    animation: shimmer 4s infinite; /* Animação mais lenta */
+    aspect-ratio: 1/1;
+    animation: shimmer 30s ease-in-out infinite; /* Animação mais lenta */
     pointer-events: none; /* Não interfere na interação */
   }
 
   @keyframes shimmer {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
+  0% {
+    transform: translate(79%, 57%) rotate(0deg);
+    animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
+  25% {
+    transform: translate(100%, 23%) rotate(120deg);
+    animation-timing-function: cubic-bezier(0.55, 0.06, 0.68, 0.19);
+  }
+  50% {
+    transform: translate(32%, 15%) rotate(240deg);
+    animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  75% {
+    transform: translate(5%, 68%) rotate(300deg);
+    animation-timing-function: cubic-bezier(0.55, 0.06, 0.68, 0.19);
+  }
+  100% {
+    transform: translate(83%, 51%) rotate(360deg);
+    animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+}
 
   .demo-icon {
     font-size: 4rem;
@@ -1214,13 +1283,11 @@
     position: relative;
     flex: 1 1 300px;
     max-width: 380px;
-    min-width: 300px;
   }
 
   .info-card:not(.decision-card) {
     flex: 1 1 300px;
     max-width: 380px;
-    min-width: 300px;
   }
 
   .info-card:hover {
@@ -1460,8 +1527,8 @@
   }
 
   /* =============================================================================
-     LOADING SPINNER & TRANSITIONS
-     ============================================================================= */
+    LOADING SPINNER & TRANSITIONS
+  ============================================================================= */
 
   .loading-overlay {
     position: fixed;
@@ -1494,8 +1561,8 @@
     width: 100%;
     height: 100%;
     animation:
-      snakeRotate 1s ease-in infinite,
-      snakeColorCycle 1s linear infinite;
+      snakeRotate 3s  ease-in-out infinite,
+      snakeColorCycle 2s ease-in-out infinite;
     transform-origin: center;
     filter: drop-shadow(0 4px 12px rgba(59, 130, 246, 0.3));
   }
@@ -1507,6 +1574,9 @@
   /* Animação de rotação alternando transições - SENTIDO HORÁRIO */
   @keyframes snakeRotate {
     0% {
+      transform: rotate(-360deg);
+    }
+    50% {
       transform: rotate(0deg);
     }
     100% {
@@ -1517,6 +1587,10 @@
   /* Animação de cores com transição gradual suave */
   @keyframes snakeColorCycle {
     0% {
+      color: hsl(220, 90%, 60%); /* Volta ao azul */
+      filter: drop-shadow(0 4px 12px hsla(220, 90%, 60%, 0.4));
+    }
+    50% {
       color: hsl(60, 95%, 57%); /* Amarelo-limão */
       filter: drop-shadow(0 4px 12px hsla(60, 95%, 57%, 0.4));
     }
@@ -1745,7 +1819,7 @@
   /* Redução de movimento para usuários com preferência de acessibilidade */
   @media (prefers-reduced-motion: reduce) {
     .snake-svg {
-      animation: snakeRotateSimple 4s linear infinite;
+      animation: snakeRotateSimple 10s ease infinite;
     }
 
     @keyframes snakeRotateSimple {
@@ -1754,8 +1828,8 @@
       }
       to {
         transform: rotate(
-          -360deg
-        ); /* Anti-horário também na versão simplificada */
+          360deg
+        ); /* versão simplificada */
       }
     }
 
@@ -1822,5 +1896,40 @@
     50% {
       transform: scale(1.005);
     }
+  }
+
+  /* Estilos para o link discreto do dashboard */
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+  }
+
+  .breadcrumb a {
+    color: var(--color-theme-1);
+    text-decoration: none;
+    transition: all var(--transition-normal);
+  }
+
+  .breadcrumb a:hover {
+    color: var(--color-theme-2);
+  }
+
+  .dashboard-link {
+    margin-left: auto;
+    opacity: 0.3;
+    font-size: 1.2rem;
+    transition: all var(--transition-normal);
+    border-radius: 4px;
+    padding: 0.25rem;
+  }
+
+  .dashboard-link:hover {
+    opacity: 1;
+    background: var(--color-bg-2);
+    transform: scale(1.1);
   }
 </style>

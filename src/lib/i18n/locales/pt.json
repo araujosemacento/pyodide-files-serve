@@ -173,5 +173,21 @@
     "kb": "KB",
     "mb": "MB",
     "gb": "GB"
+  },
+  "dashboard": {
+    "title": "Dashboard de Analytics",
+    "description": "Insights e métricas de uso da aplicação",
+    "back_to_home": "Voltar ao Início",
+    "page_views": "Visualizações de Página",
+    "unique_ips": "IPs Únicos",
+    "avg_duration": "Duração Média",
+    "search_usage": "Uso da Pesquisa",
+    "filter_usage": "Uso de Filtros",
+    "commonjs_copies": "Cópias CommonJS",
+    "esm_copies": "Cópias ES Module",
+    "interactions": "Interações dos Usuários",
+    "language_distribution": "Distribuição por Idioma",
+    "top_files": "Top 10 Arquivos Mais Acessados",
+    "footer_text": "Analytics atualizados em tempo real através do Pantry Cloud"
   }
 }
