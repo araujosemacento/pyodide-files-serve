@@ -34,6 +34,7 @@ export default defineConfig({
 ```
 
 **Benefícios:**
+
 - Source maps aprimorados para debugging
 - Acesso de arquivo otimizado para DevTools
 - Documentação inline com referências oficiais
@@ -56,13 +57,14 @@ if (dev && event.url.pathname === '/.well-known/appspecific/com.chrome.devtools.
 ```
 
 **Benefícios:**
+
 - Múltiplas opções de controle documentadas
 - Flexibilidade para diferentes cenários de segurança
 - Exemplos práticos de implementação
 
 ### 3. **DevToolsPanel.svelte - Interface Completa**
 
-#### Funcionalidades Adicionadas:
+#### Funcionalidades Adicionadas
 
 - **🔍 Detecção Aprimorada:** Informações detalhadas sobre o estado do DevTools
 - **📖 Guia Interativo:** Passo-a-passo completo para configuração
@@ -70,7 +72,7 @@ if (dev && event.url.pathname === '/.well-known/appspecific/com.chrome.devtools.
 - **📚 Links Atualizados:** Documentação oficial do Svelte e Chrome
 - **❌ Estado Desabilitado:** Diagnóstico e soluções quando inativo
 
-#### Interface Antes/Depois:
+#### Interface Antes/Depois
 
 ```svelte
 <!-- ✅ ANTES -->
@@ -89,14 +91,14 @@ if (dev && event.url.pathname === '/.well-known/appspecific/com.chrome.devtools.
 
 ### 4. **Documentação Atualizada**
 
-#### `SVELTE_DEVTOOLS.md` - Melhorias:
+#### `SVELTE_DEVTOOLS.md` - Melhorias
 
 - **Instalação:** Método oficial via `npx sv add devtools-json`
 - **Segurança:** Seção detalhada com riscos e mitigações
 - **Controle:** 4 métodos diferentes para desabilitar/controlar
 - **Boas Práticas:** Diretrizes de segurança e uso
 
-#### Seções Adicionadas:
+#### Seções Adicionadas
 
 1. **⚠️ Considerações de Segurança**
    - Riscos identificados e mitigações
